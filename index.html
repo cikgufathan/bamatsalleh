@@ -3,533 +3,312 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hall of Fame V14.0 - Ultimate</title>
+    <title>Hall of Fame - Arabic Merit</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --bg-dark: #0f172a;
             --glass: rgba(30, 41, 59, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.1);
             --gold: #fbbf24; --gold-glow: rgba(251, 191, 36, 0.4);
-            --silver: #94a3b8;
-            --bronze: #b45309;
-            --neon: #8b5cf6; --neon-glow: rgba(139, 92, 246, 0.4);
+            --neon: #8b5cf6;
             --text-main: #f8fafc;
-            --text-muted: #94a3b8;
         }
 
         body {
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
-            background-attachment: fixed;
-            color: var(--text-main);
-            font-family: 'Rajdhani', sans-serif;
-            margin: 0;
-            padding-bottom: 80px;
-            overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
+            background-image: radial-gradient(at 50% 0%, #1e1b4b 0%, #020617 80%);
+            color: var(--text-main); font-family: 'Rajdhani', sans-serif;
+            margin: 0; padding-bottom: 80px; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- UTILITIES & ANIMATIONS --- */
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-        @keyframes shine { 0% { background-position: -100px; } 100% { background-position: 200px; } }
-        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 var(--gold-glow); } 70% { box-shadow: 0 0 0 15px rgba(0,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(0,0,0,0); } }
-        
-        .skeleton { background: #1e293b; background: linear-gradient(90deg, #1e293b 0%, #334155 50%, #1e293b 100%); background-size: 200px 100%; animation: shine 1.5s infinite linear; border-radius: 8px; }
-
-        /* --- AUDIO PANEL --- */
+        /* --- UI COMPONENTS --- */
         .audio-panel {
             position: fixed; top: 15px; right: 15px; z-index: 999;
-            background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px);
+            background: rgba(15,23,42,0.8); backdrop-filter: blur(10px);
             padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 12px;
-            border: 1px solid var(--glass-border); box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            transition: 0.3s; transform: translateY(-100px); /* Hidden initially */
+            border: 1px solid rgba(255,255,255,0.1); transform: translateY(-100px); transition: 0.3s;
         }
         .audio-panel.visible { transform: translateY(0); }
-        .audio-panel i { color: var(--gold); cursor: pointer; font-size: 1.1rem; }
-        .vol-slider { width: 70px; height: 4px; accent-color: var(--gold); cursor: pointer; }
+        .vol-slider { width: 70px; height: 4px; accent-color: var(--gold); }
 
-        /* --- START SCREEN --- */
+        /* Start Screen */
         #start-screen {
-            position: fixed; inset: 0; z-index: 10000;
-            background: var(--bg-dark);
-            background-image: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center;
+            position: fixed; inset: 0; z-index: 10000; background: #020617;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
         }
-        .logo-glow { font-size: 4rem; color: var(--gold); filter: drop-shadow(0 0 20px var(--gold)); animation: float 3s ease-in-out infinite; }
         .btn-enter {
             background: linear-gradient(135deg, #fbbf24, #d97706);
             color: #000; border: none; padding: 18px 50px;
-            font-size: 1.4rem; font-family: 'Orbitron'; font-weight: 900; letter-spacing: 2px;
-            border-radius: 50px; cursor: pointer; margin-top: 40px;
-            animation: pulse-btn 2s infinite; transition: transform 0.2s;
+            font-size: 1.4rem; font-family: 'Orbitron'; font-weight: 900;
+            border-radius: 50px; cursor: pointer; margin-top: 30px;
+            box-shadow: 0 0 30px var(--gold-glow); animation: pulse 2s infinite;
         }
-        .btn-enter:active { transform: scale(0.95); }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* --- HEADER --- */
+        /* Header & Podium */
         header { text-align: center; padding: 40px 20px 20px; }
-        h1 { font-family: 'Orbitron'; font-size: 2.2rem; margin: 0; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(255,255,255,0.3)); }
-        .subtitle { color: var(--neon); letter-spacing: 4px; font-size: 0.8rem; font-weight: 700; margin-top: 5px; text-transform: uppercase; }
-
-        /* --- PODIUM --- */
+        h1 { font-family: 'Orbitron'; font-size: 2.2rem; margin: 0; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
         .podium-container {
             display: flex; justify-content: center; align-items: flex-end;
-            height: 280px; gap: 12px; margin: 20px auto 40px; max-width: 600px; padding: 0 15px;
+            height: 260px; gap: 10px; margin: 20px auto 30px; max-width: 600px; padding: 0 15px;
         }
         .podium-card {
             flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
             background: var(--glass); backdrop-filter: blur(10px);
-            border: 1px solid var(--glass-border); border-radius: 15px 15px 5px 5px;
-            padding-bottom: 15px; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s;
-            position: relative; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px 15px 5px 5px;
+            padding-bottom: 10px; cursor: pointer; transition: 0.3s;
         }
-        .podium-card:active { transform: scale(0.95); }
-        .podium-card::before { content:''; position: absolute; top:0; left:0; right:0; height: 100%; opacity: 0.2; background: linear-gradient(to bottom, transparent, black); }
-        
-        .r-1 { height: 100%; border-top: 4px solid var(--gold); box-shadow: 0 0 30px rgba(251, 191, 36, 0.2); order: 2; z-index: 2; }
-        .r-2 { height: 80%; border-top: 4px solid var(--silver); box-shadow: 0 0 20px rgba(148, 163, 184, 0.2); order: 1; }
-        .r-3 { height: 70%; border-top: 4px solid var(--bronze); box-shadow: 0 0 20px rgba(180, 83, 9, 0.2); order: 3; }
+        .r-1 { height: 100%; border-top: 4px solid var(--gold); order: 2; z-index: 2; box-shadow: 0 0 20px rgba(251,191,36,0.2); }
+        .r-2 { height: 80%; border-top: 4px solid #94a3b8; order: 1; }
+        .r-3 { height: 70%; border-top: 4px solid #b45309; order: 3; }
+        .p-score { font-family: 'Orbitron'; font-size: 1.4rem; font-weight: 800; margin-top: 5px; }
+        .p-name { font-size: 0.8rem; font-weight: 700; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px; color:#cbd5e1;}
 
-        .rank-icon { font-size: 2rem; margin-bottom: 10px; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
-        .p-score { font-family: 'Orbitron'; font-size: 1.5rem; font-weight: 800; color: white; z-index: 1; }
-        .p-name { font-size: 0.85rem; font-weight: 700; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted); z-index: 1; margin-top: 5px;}
-
-        /* --- LIST & CONTROLS --- */
+        /* List & Tabs */
         .controls { max-width: 650px; margin: 0 auto; padding: 0 15px; }
-        .tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 15px; scrollbar-width: none; }
-        .tab-btn {
-            background: rgba(255,255,255,0.05); color: var(--text-muted);
-            border: 1px solid var(--glass-border); padding: 10px 20px; border-radius: 30px;
-            white-space: nowrap; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: 0.3s;
-        }
-        .tab-btn.active { background: var(--neon); color: white; border-color: var(--neon); box-shadow: 0 0 15px var(--neon-glow); }
+        .tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .tab-btn { background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); padding: 8px 18px; border-radius: 20px; white-space: nowrap; cursor: pointer; }
+        .tab-btn.active { background: var(--neon); color: white; border-color: var(--neon); box-shadow: 0 0 15px rgba(139,92,246,0.4); }
+        
+        .search-box { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; margin-bottom: 15px; font-family: 'Rajdhani'; }
 
-        .search-box {
-            width: 100%; padding: 15px 20px; border-radius: 15px; border: 1px solid var(--glass-border);
-            background: rgba(0,0,0,0.3); color: white; font-family: 'Rajdhani'; font-size: 1.1rem;
-            box-sizing: border-box; outline: none; transition: 0.3s;
-        }
-        .search-box:focus { border-color: var(--neon); background: rgba(0,0,0,0.5); }
-
-        .list-container { max-width: 650px; margin: 20px auto; padding: 0 15px; min-height: 300px; }
+        .list-container { max-width: 650px; margin: 0 auto; padding: 0 15px; }
         .student-row {
-            background: var(--glass); backdrop-filter: blur(5px);
-            margin-bottom: 10px; padding: 15px 20px; border-radius: 16px;
-            display: flex; justify-content: space-between; align-items: center;
-            border: 1px solid rgba(255,255,255,0.03); cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+            background: var(--glass); margin-bottom: 8px; padding: 12px 18px; border-radius: 12px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.03);
+            animation: fadeIn 0.5s ease;
         }
-        .student-row:active { transform: scale(0.98); background: rgba(255,255,255,0.1); }
-        .student-info { display: flex; align-items: center; gap: 15px; }
-        .rank-num { font-family: 'Orbitron'; color: var(--text-muted); width: 30px; font-size: 1rem; font-weight: bold; }
-        .s-name { font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px; }
-        .s-badge { font-size: 0.7rem; font-weight: bold; padding: 2px 8px; border-radius: 4px; margin-left: 5px; text-transform: uppercase; letter-spacing: 1px; }
-        .s-score { font-family: 'Orbitron'; font-weight: 900; font-size: 1.3rem; color: var(--gold); text-shadow: 0 0 10px rgba(251, 191, 36, 0.3); }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+        .s-score { font-family: 'Orbitron'; font-weight: 900; font-size: 1.2rem; color: var(--gold); }
 
-        /* --- MODAL CARD --- */
-        #card-modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 10000;
-            display: none; align-items: center; justify-content: center; padding: 20px;
-            backdrop-filter: blur(8px); animation: fadeIn 0.3s;
+        /* Refresh Button */
+        .refresh-btn {
+            position: fixed; bottom: 20px; right: 20px; z-index: 999;
+            background: var(--gold); color: #000; width: 50px; height: 50px; border-radius: 50%;
+            border: none; box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); font-size: 1.2rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;
         }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popUp { from { transform: scale(0.8) translateY(20px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+        .refresh-btn:active { transform: scale(0.9); }
+        .refresh-btn.spinning i { animation: spinIcon 1s linear infinite; }
+        @keyframes spinIcon { 100% { transform: rotate(360deg); } }
 
-        .player-card {
-            background: linear-gradient(135deg, #1e1b4b, #0f172a);
-            width: 100%; max-width: 340px; padding: 40px 30px; border-radius: 30px;
-            border: 2px solid var(--glass-border); text-align: center;
-            position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        /* Card Background Decorations */
-        .card-bg-glow { position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(139,92,246,0.15) 0%, transparent 60%); pointer-events: none; }
-        
-        .pc-rank-badge { 
-            display: inline-block; padding: 5px 15px; border-radius: 20px; 
-            font-family: 'Orbitron'; font-size: 0.8rem; letter-spacing: 2px; margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.05);
-        }
-        .pc-score { font-size: 4.5rem; font-family: 'Orbitron'; font-weight: 900; line-height: 1; margin: 10px 0; text-shadow: 0 0 30px currentColor; }
-        .pc-name { font-size: 1.4rem; font-weight: 800; color: white; text-transform: uppercase; margin-bottom: 5px; line-height: 1.2; }
-        .pc-desc { font-style: italic; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
-
-        .btn-share {
-            background: var(--text-main); color: var(--bg-dark); border: none;
-            padding: 15px; border-radius: 15px; width: 100%; font-weight: 800; font-family: 'Orbitron';
-            cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-            font-size: 1rem; transition: 0.2s;
-        }
-        .btn-share:active { transform: scale(0.95); opacity: 0.9; }
-        .close-modal { margin-top: 15px; background: none; border: none; color: var(--text-muted); cursor: pointer; text-decoration: underline; }
-
-        /* Loading State */
-        .loading-row { display: flex; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
-        .sk-text { height: 20px; flex: 1; }
-        .sk-num { height: 30px; width: 50px; }
+        /* Modal */
+        #card-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .player-card { background: linear-gradient(135deg, #1e1b4b, #0f172a); width: 85%; max-width: 320px; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); text-align: center; }
+        .pc-score { font-size: 4rem; font-family: 'Orbitron'; color: var(--gold); margin: 10px 0; font-weight: 900; text-shadow: 0 0 20px var(--gold); }
     </style>
 </head>
 <body onload="init()">
 
 <div class="audio-panel" id="audioPanel">
     <i class="fas fa-volume-up" id="muteIcon" onclick="toggleMute()"></i>
-    <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.1" value="0.3" oninput="adjustVolume(this.value)">
+    <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.1" value="0.4" oninput="adjustVolume(this.value)">
 </div>
 
 <div id="start-screen">
-    <div class="logo-glow"><i class="fas fa-crown"></i></div>
-    <h2 style="color:var(--text-muted); letter-spacing: 4px; margin-top: 20px; font-weight:300;">ARABIC MERIT V14.0</h2>
-    <h1 style="font-size: 2.5rem; margin-top: 0;">HALL OF FAME</h1>
+    <div style="font-size:3rem; color:var(--gold); margin-bottom:20px;"><i class="fas fa-crown"></i></div>
+    <h1 style="font-size:1.5rem; color:#94a3b8; letter-spacing:2px; margin:0;">ARABIC MERIT</h1>
+    <h2 style="font-size:2.5rem; margin:5px 0; font-family:'Orbitron'">HALL OF FAME</h2>
     <button class="btn-enter" onclick="enterArena()">MASUK ARENA</button>
-    <p style="color:var(--text-muted); font-size:0.7rem; position:absolute; bottom:20px;">Powered by Google Sheets & GitHub</p>
 </div>
 
 <audio id="bgm" loop>
-    <source src="https://cdn.pixabay.com/audio/2022/08/02/audio_884fe92c21.mp3" type="audio/mpeg">
+    <source src="https://cdn.pixabay.com/audio/2023/10/24/audio_3d1a868460.mp3" type="audio/mpeg">
 </audio>
 
 <header>
     <h1>HALL OF FAME</h1>
-    <div class="subtitle">PEJUANG BAHASA ARAB</div>
+    <div style="color:var(--neon); letter-spacing:3px; font-weight:bold; font-size:0.8rem; margin-top:5px;">PEJUANG BAHASA ARAB</div>
 </header>
 
 <div class="controls">
-    <div class="tabs" id="tabs">
-        <div class="skeleton" style="width:80px; height:35px; border-radius:30px"></div>
-        <div class="skeleton" style="width:80px; height:35px; border-radius:30px"></div>
-        <div class="skeleton" style="width:80px; height:35px; border-radius:30px"></div>
-    </div>
+    <div class="tabs" id="tabs"></div>
 </div>
 
-<div class="podium-container" id="podium">
-    <div class="podium-card r-2"><div class="skeleton" style="width:50%; height:50px; margin-bottom:10px"></div></div>
-    <div class="podium-card r-1"><div class="skeleton" style="width:50%; height:50px; margin-bottom:10px"></div></div>
-    <div class="podium-card r-3"><div class="skeleton" style="width:50%; height:50px; margin-bottom:10px"></div></div>
-</div>
+<div class="podium-container" id="podium"></div>
 
 <div class="controls">
-    <input type="text" class="search-box" id="search" placeholder="Cari nama pelajar..." onkeyup="renderList()">
+    <input type="text" class="search-box" id="search" placeholder="Cari nama..." onkeyup="renderList()">
 </div>
+<div class="list-container" id="list"></div>
 
-<div class="list-container" id="list">
-    <div class="loading-row"><div class="skeleton sk-text"></div><div class="skeleton sk-num"></div></div>
-    <div class="loading-row"><div class="skeleton sk-text"></div><div class="skeleton sk-num"></div></div>
-    <div class="loading-row"><div class="skeleton sk-text"></div><div class="skeleton sk-num"></div></div>
-    <div class="loading-row"><div class="skeleton sk-text"></div><div class="skeleton sk-num"></div></div>
-</div>
+<button class="refresh-btn" onclick="manualRefresh(this)"><i class="fas fa-sync-alt"></i></button>
 
 <div id="card-modal" onclick="closeCard()">
     <div class="player-card" id="capture-area" onclick="event.stopPropagation()">
-        <div class="card-bg-glow"></div>
-        
-        <div id="m-rank-badge" class="pc-rank-badge">KHALIFAH</div>
-        
-        <div style="margin: 20px 0;">
-            <i id="m-rank-icon" class="fas fa-crown" style="font-size: 3rem; color:white; filter:drop-shadow(0 0 15px currentColor)"></i>
-        </div>
-        
-        <div class="pc-name" id="m-name">NAMA PELAJAR</div>
+        <div id="m-rank-badge" style="color:var(--gold); font-family:'Orbitron'; letter-spacing:2px; margin-bottom:10px;">KHALIFAH</div>
+        <i id="m-rank-icon" class="fas fa-crown" style="font-size: 3rem; color:white; margin:10px 0;"></i>
+        <div id="m-name" style="font-size: 1.3rem; font-weight: 800; color:white; margin-top:10px;">NAMA</div>
         <div class="pc-score" id="m-score">0</div>
-        <div class="pc-desc" id="m-desc">"Usaha tangga kejayaan!"</div>
-        
-        <div id="share-controls">
-            <button class="btn-share" onclick="shareCard()"><i class="fas fa-share-nodes"></i> KONGSI KAD</button>
-            <button class="close-modal" onclick="closeCard()">Tutup</button>
-        </div>
-        
-        <div id="m-footer" style="display:none; margin-top:20px; font-size:0.6rem; color:#64748b; letter-spacing:2px">ARABIC MERIT PRO</div>
+        <div id="m-desc" style="color:#94a3b8; font-style:italic; margin-bottom:25px;">"Usaha tangga kejayaan!"</div>
+        <button onclick="shareCard()" style="background:var(--neon); color:white; border:none; padding:12px; border-radius:15px; width:100%; font-weight:bold; cursor:pointer;">SHARE KAD</button>
+        <div style="margin-top:10px; font-size:0.8rem; color:#64748b; cursor:pointer;" onclick="closeCard()">Tutup</div>
     </div>
 </div>
 
 <script>
-    // --- CONFIGURATION ---
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec"; // Ganti dengan URL Apps Script anda
+    // --- LINK SCRIPT TUAN (AUTOMATIK) ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
     
-    // SFX "Coin" dalam format Base64 (Zero dependency, sentiasa berfungsi)
-    const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
+    const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
 
-    let db = [];
-    let classes = [];
-    let activeCl = "";
-    let isMuted = false;
-    let lastVol = 0.3;
+    let db = [], classes = [], activeCl = "";
+    let isMuted = false, lastVol = 0.4;
     let audioCoin = new Audio(COIN_SFX);
 
-    // --- INITIALIZATION ---
     function init() {
-        // Fetch data
-        fetchData();
+        fetchData(); 
+        // AUTO REFRESH SETIAP 10 SAAT
+        setInterval(() => {
+            console.log("Auto-updating...");
+            fetchData(true); 
+        }, 10000); 
     }
 
-    async function fetchData() {
+    async function fetchData(isSilent = false) {
         try {
             const res = await fetch(API_URL);
             const data = await res.json();
+            db = data.map(x => ({ n: String(x[0]), s: parseInt(x[1]) || 0, c: String(x[2]) }));
             
-            // Map & clean data
-            db = data.map(x => ({ 
-                n: String(x[0]), 
-                s: parseInt(x[1]) || 0, 
-                c: String(x[2]) 
-            }));
-
-            // Extract Unique Classes
+            // Extract Classes
+            const prevClass = activeCl;
             classes = [...new Set(db.map(x => x.c))];
-            if(classes.length > 0) activeCl = classes[0];
+            if(!activeCl && classes.length > 0) activeCl = classes[0];
 
             renderTabs();
             renderList();
+        } catch (e) { console.error("Connection error"); }
+    }
 
-        } catch (e) {
-            console.error("Gagal sambung ke server", e);
-            document.getElementById('list').innerHTML = `<div style="text-align:center; padding:20px; color:var(--bronze)">Gagal memuat turun data.<br>Sila semak internet anda.</div>`;
-        }
+    async function manualRefresh(btn) {
+        btn.classList.add('spinning');
+        if(navigator.vibrate) navigator.vibrate(30);
+        await fetchData();
+        setTimeout(() => btn.classList.remove('spinning'), 500);
     }
 
     function enterArena() {
-        document.getElementById('start-screen').style.opacity = '0';
-        setTimeout(() => {
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('audioPanel').classList.add('visible');
-        }, 500);
-
-        // Audio Logic
-        const bgm = document.getElementById('bgm');
-        bgm.volume = 0.3;
-        bgm.play().catch(e => console.log("Autoplay prevented by browser", e));
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('audioPanel').classList.add('visible');
         
-        playSoundEffect();
-        fireConfetti(1); // Default confetti
+        const bgm = document.getElementById('bgm');
+        bgm.volume = 0.4;
+        bgm.play().catch(e=>console.log("Audio block"));
+        
+        playSound();
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
     }
 
-    // --- RENDERING ---
     function renderTabs() {
-        const tabsContainer = document.getElementById('tabs');
-        tabsContainer.innerHTML = classes.map(c => 
+        document.getElementById('tabs').innerHTML = classes.map(c => 
             `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
         ).join('');
     }
 
     function setCl(c) {
-        if(activeCl === c) return;
         activeCl = c;
-        
-        // UI Feedback
-        if(navigator.vibrate) navigator.vibrate(20); // Haptic small tap
-        playSoundEffect();
-        
+        playSound();
         renderTabs();
         renderList();
-        
-        // Minimal Confetti
-        confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 }, colors:['#fbbf24', '#ffffff'] });
     }
 
     function renderList() {
-        const query = document.getElementById('search').value.toLowerCase();
+        const q = document.getElementById('search').value.toLowerCase();
+        // Sort: Markah Tinggi -> Rendah. Kalau sama, Nama A->Z
+        let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
         
-        // Sorting Logic: Markah Tertinggi -> Jika sama, Nama (A-Z)
-        let list = db.filter(x => x.c === activeCl)
-                     .sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
-
-        const podium = document.getElementById('podium');
-        const listContainer = document.getElementById('list');
-
-        podium.innerHTML = "";
-        listContainer.innerHTML = "";
-
-        // Top 3 Podium
-        const top3 = list.slice(0, 3);
-        const podiumOrder = [1, 0, 2]; // Susunan visual: 2, 1, 3 (Silver, Gold, Bronze)
-        
-        podiumOrder.forEach(idx => {
-            if (top3[idx]) {
-                const p = top3[idx];
-                const rank = idx + 1;
+        // Podium
+        const pod = document.getElementById('podium');
+        pod.innerHTML = "";
+        const top3 = list.slice(0,3);
+        const order = [1,0,2]; // Susunan Silver-Gold-Bronze
+        order.forEach(i => {
+            if(top3[i]) {
+                const p = top3[i];
+                const rank = i+1;
                 const icons = ['👑','🥈','🥉'];
-                const rankClass = `r-${rank}`;
-                
-                podium.innerHTML += `
-                    <div class="podium-card ${rankClass}" onclick="showCard('${p.n}', ${p.s})">
-                        <div class="rank-icon">${icons[idx]}</div>
-                        <div class="p-score">${p.s}</div>
-                        <div class="p-name">${p.n.split(" ")[0]}</div>
-                    </div>
-                `;
+                pod.innerHTML += `<div class="podium-card r-${rank}" onclick="showCard('${p.n}',${p.s})">
+                    <div style="font-size:2rem; margin-bottom:5px;">${icons[i]}</div>
+                    <div class="p-score">${p.s}</div>
+                    <div class="p-name">${p.n.split(" ")[0]}</div>
+                </div>`;
             }
         });
 
-        // Full List
+        // List
+        const cont = document.getElementById('list');
+        cont.innerHTML = "";
         list.forEach((p, i) => {
-            if(query && !p.n.toLowerCase().includes(query)) return;
-            
-            const rankData = getRankData(p.s);
+            if(q && !p.n.toLowerCase().includes(q)) return;
+            const rank = getRank(p.s);
             const isTop3 = i < 3;
-            const rowBorder = isTop3 ? `border-left: 4px solid ${rankData.color}` : '';
-
-            listContainer.innerHTML += `
-                <div class="student-row" style="${rowBorder}" onclick="showCard('${p.n}', ${p.s})">
-                    <div class="student-info">
-                        <div class="rank-num" style="color:${isTop3 ? rankData.color : 'var(--text-muted)'}">#${i+1}</div>
-                        <div>
-                            <div class="s-name">${p.n}</div>
-                            <div style="display:flex; align-items:center; margin-top:2px;">
-                                <i class="fas ${rankData.icon}" style="color:${rankData.color}; font-size:0.7rem"></i>
-                                <span class="s-badge" style="background:${rankData.color}20; color:${rankData.color}">${rankData.label}</span>
-                            </div>
-                        </div>
+            cont.innerHTML += `<div class="student-row" style="${isTop3?'border-left:3px solid '+rank.c:''}" onclick="showCard('${p.n}',${p.s})">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="color:#64748b; font-family:'Orbitron'; width:25px;">#${i+1}</span>
+                    <div>
+                        <div style="font-weight:700;">${p.n}</div>
+                        <div style="font-size:0.7rem; color:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</div>
                     </div>
-                    <div class="s-score" style="color:${rankData.color}">${p.s}</div>
                 </div>
-            `;
+                <div class="s-score" style="color:${rank.c}">${p.s}</div>
+            </div>`;
         });
     }
 
-    function getRankData(s) {
-        if(s >= 100) return { label: "KHALIFAH", icon: "fa-crown", color: "#fbbf24" }; // Gold
-        if(s >= 60) return { label: "ELITE", icon: "fa-star", color: "#94a3b8" }; // Silver
-        if(s >= 30) return { label: "PRO", icon: "fa-shield-halved", color: "#b45309" }; // Bronze
-        return { label: "NEWBIE", icon: "fa-user", color: "#64748b" }; // Slate
+    function getRank(s) {
+        if(s >= 100) return { l:"KHALIFAH", i:"fa-crown", c:"#fbbf24" };
+        if(s >= 60) return { l:"ELITE", i:"fa-star", c:"#94a3b8" };
+        if(s >= 30) return { l:"PRO", i:"fa-shield-halved", c:"#b45309" };
+        return { l:"NEWBIE", i:"fa-user", c:"#64748b" };
     }
 
-    // --- MODAL & SHARING ---
     function showCard(n, s) {
-        if(navigator.vibrate) navigator.vibrate(50);
-        
-        const rankData = getRankData(s);
-        const modal = document.getElementById('card-modal');
-        
-        // Populate Data
+        const r = getRank(s);
+        document.getElementById('card-modal').style.display = 'flex';
         document.getElementById('m-name').innerText = n;
         document.getElementById('m-score').innerText = s;
-        document.getElementById('m-score').style.color = rankData.color;
-        
-        const badge = document.getElementById('m-rank-badge');
-        badge.innerText = rankData.label;
-        badge.style.color = rankData.color;
-        badge.style.borderColor = rankData.color;
-        
-        document.getElementById('m-rank-icon').className = `fas ${rankData.icon}`;
-        document.getElementById('m-rank-icon').style.color = rankData.color;
-
-        // Custom Motivasi
-        let desc = "Teruskan Usaha!";
-        if(s >= 100) desc = "Lagenda Bahasa Arab yang Sebenar!";
-        else if(s >= 80) desc = "Sedikit lagi menuju puncak!";
-        else if(s >= 60) desc = "Prestasi yang membanggakan!";
-        else if(s >= 30) desc = "Permulaan yang baik, teruskan!";
-        document.getElementById('m-desc').innerText = `"${desc}"`;
-
-        modal.style.display = 'flex';
-        
-        // Confetti burst for high scores
-        if(s >= 60) fireConfetti(2);
+        document.getElementById('m-score').style.color = r.c;
+        document.getElementById('m-rank-badge').innerText = r.l;
+        document.getElementById('m-rank-badge').style.color = r.c;
+        document.getElementById('m-rank-icon').className = `fas ${r.i}`;
+        document.getElementById('m-rank-icon').style.color = r.c;
+        if(s>=100) document.getElementById('m-desc').innerText = '"Lagenda Bahasa Arab!"';
+        else if(s>=60) document.getElementById('m-desc').innerText = '"Pejuang Sejati!"';
+        else document.getElementById('m-desc').innerText = '"Teruskan Usaha!"';
+        playSound();
     }
 
-    function closeCard() {
-        document.getElementById('card-modal').style.display = 'none';
-        // Reset button state just in case
-        document.querySelector('.btn-share').style.display = 'flex';
-        document.querySelector('.close-modal').style.display = 'inline-block';
-        document.getElementById('m-footer').style.display = 'none';
-    }
-
+    function closeCard() { document.getElementById('card-modal').style.display='none'; }
+    
     async function shareCard() {
-        const captureArea = document.getElementById('capture-area');
-        const ctrls = document.getElementById('share-controls');
-        const footer = document.getElementById('m-footer');
-        
-        // Prepare for capture
-        ctrls.style.display = 'none';
-        footer.style.display = 'block';
-        captureArea.style.borderRadius = "0"; // Square corners for cleaner image
-        
-        try {
-            const canvas = await html2canvas(captureArea, {
-                backgroundColor: '#0f172a',
-                scale: 2, // High Res
-                useCORS: true
-            });
-            
-            const link = document.createElement('a');
-            link.download = `HallOfFame_${document.getElementById('m-name').innerText.replace(/\s/g,'')}.png`;
-            link.href = canvas.toDataURL("image/png");
-            link.click();
-            
-        } catch (err) {
-            alert("Maaf, error semasa mengambil gambar.");
-        } finally {
-            // Restore UI
-            ctrls.style.display = 'block';
-            footer.style.display = 'none';
-            captureArea.style.borderRadius = "30px";
-        }
+        const area = document.getElementById('capture-area');
+        const canvas = await html2canvas(area, { backgroundColor: '#0f172a', scale: 2 });
+        const link = document.createElement('a');
+        link.download = `ArabicMerit_${document.getElementById('m-name').innerText}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
     }
 
-    // --- AUDIO UTILS ---
-    function playSoundEffect() {
-        if(!isMuted) {
-            audioCoin.currentTime = 0;
-            audioCoin.volume = lastVol;
-            audioCoin.play();
-        }
+    function playSound() { if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } }
+    function toggleMute() { 
+        const bgm = document.getElementById('bgm');
+        isMuted = !isMuted;
+        bgm.volume = isMuted ? 0 : lastVol;
+        document.getElementById('muteIcon').className = isMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
+        document.getElementById('volSlider').value = bgm.volume;
     }
-
     function adjustVolume(v) {
-        const bgm = document.getElementById('bgm');
-        bgm.volume = v;
+        document.getElementById('bgm').volume = v;
         lastVol = v;
-        updateAudioIcon(v);
-    }
-
-    function toggleMute() {
-        const bgm = document.getElementById('bgm');
-        if(!isMuted) {
-            bgm.volume = 0;
-            document.getElementById('volSlider').value = 0;
-            isMuted = true;
-            updateAudioIcon(0);
-        } else {
-            bgm.volume = lastVol || 0.3;
-            document.getElementById('volSlider').value = bgm.volume;
-            isMuted = false;
-            updateAudioIcon(bgm.volume);
-        }
-    }
-
-    function updateAudioIcon(v) {
-        const icon = document.getElementById('muteIcon');
-        if(v == 0) icon.className = "fas fa-volume-mute";
-        else if(v < 0.5) icon.className = "fas fa-volume-down";
-        else icon.className = "fas fa-volume-up";
-    }
-
-    function fireConfetti(level) {
-        if(level === 1) {
-             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-        } else {
-             // Realistic Gold Confetti
-             var count = 200;
-             var defaults = { origin: { y: 0.7 } };
-             function fire(particleRatio, opts) {
-                confetti(Object.assign({}, defaults, opts, { particleCount: Math.floor(count * particleRatio) }));
-             }
-             fire(0.25, { spread: 26, startVelocity: 55, colors:['#fbbf24'] });
-             fire(0.2, { spread: 60, colors:['#ffffff'] });
-             fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8, colors:['#fbbf24'] });
-        }
+        isMuted = false;
+        document.getElementById('muteIcon').className = "fas fa-volume-up";
     }
 </script>
 </body>
