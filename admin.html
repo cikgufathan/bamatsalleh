@@ -3,389 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN CONSOLE - Arabic Merit Pro V11.0 (Secure)</title>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-
+    <title>Admin Panel - Arabic Merit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --primary: #4f46e5; --bg: #f1f5f9; --card: #ffffff;
-            --text: #0f172a; --success: #22c55e; --danger: #ef4444;
-            --warning: #f59e0b; --info: #0ea5e9; --dark: #1e293b;
-        }
-
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .desktop-container { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
-
-        .sidebar { background: var(--card); padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); height: fit-content; position: sticky; top: 20px; }
-        header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
-        .sync-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.3); }
-
-        .main-content { background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        .tabs-container { background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 8px; overflow-x: auto; border: 1px solid #e2e8f0; min-height: 50px; align-items: center; }
-        .tab-btn { padding: 10px 20px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: grab; white-space: nowrap; font-weight: 600; transition: 0.2s; }
-        .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); cursor: pointer; }
-
-        .admin-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn-action { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; transition: transform 0.1s; }
-        .btn-action:active { transform: scale(0.98); }
-
-        .search-bar { width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 20px; font-size: 1rem; box-sizing: border-box; }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; transition: background 0.3s; }
-        tr:hover td { background: #f8fafc; }
-
-        /* MERIT BUTTONS STYLING */
-        .score-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; }
-        .btn-pts { padding: 8px 4px; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; font-size: 0.7rem; transition: 0.2s; }
-        .btn-pts:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .btn-pts:active { transform: scale(0.95); }
+        body { background: #0f172a; color: #f8fafc; font-family: sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { max-width: 400px; width: 100%; }
         
-        .rank-tag { font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; color: white; font-weight: bold; text-transform: uppercase; }
-
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
-        .modal { background: white; padding: 30px; border-radius: 15px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; animation: slideUp 0.3s ease-out; }
-        .modal h3 { margin-top: 0; }
-        .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .stat-box { padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary); background: #f8fafc; text-align: center; }
+        /* Login */
+        #login-box { text-align: center; margin-top: 50px; }
+        input, select, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; font-size: 1rem; box-sizing: border-box;}
+        button { background: #3b82f6; border: none; font-weight: bold; cursor: pointer; }
+        button:hover { background: #2563eb; }
+        .btn-del { background: #ef4444; margin-top: 5px; }
         
-        .sortable-ghost { opacity: 0.4; background: var(--info) !important; }
-
-        /* UPGRADED FEATURES CSS */
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes popScore { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
-        .pop-anim { animation: popScore 0.3s ease-in-out; }
-
-        /* TOAST NOTIFICATION */
-        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: var(--dark); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 500; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s forwards; }
-        .toast.success { background: var(--success); }
-        .toast.danger { background: var(--danger); }
+        /* Panel */
+        #panel { display: none; }
+        .card { background: #1e293b; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #334155; }
+        h2 { margin-top: 0; color: #3b82f6; }
+        label { font-size: 0.8rem; color: #94a3b8; font-weight: bold; }
+        
+        /* Toast */
+        #toast { visibility: hidden; min-width: 250px; background-color: #10b981; color: #fff; text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 1; bottom: 30px; font-weight: bold; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
-<body onload="init()">
+<body>
 
-<div id="toast-container"></div>
-
-<div class="desktop-container">
-    <div class="sidebar">
-        <header>
-            <h2 style="margin:0"><i class="fas fa-graduation-cap"></i> MERIT ADMIN</h2>
-            <div id="syncStatus" class="sync-badge">Menghubungkan...</div>
-        </header>
-
-        <div class="stats-grid">
-            <div class="stat-box" style="border-color:var(--success)">
-                <small>JUMLAH MERIT</small><div id="mSum" style="font-size:1.5rem; font-weight:800; color:var(--success)">0</div>
-            </div>
-            <div class="stat-box" style="border-color:var(--danger)">
-                <small>JUMLAH DEMERIT</small><div id="dSum" style="font-size:1.5rem; font-weight:800; color:var(--danger)">0</div>
-            </div>
-        </div>
-
-        <div style="height: 200px; margin-bottom: 20px;"><canvas id="sideChart"></canvas></div>
-
-        <div class="admin-controls" id="controlPanel" style="display:none">
-            <button class="btn-action" style="background:var(--success)" onclick="openM('addM')"><i class="fas fa-user-plus"></i> Pelajar</button>
-            <button class="btn-action" style="background:var(--info)" onclick="openM('addClassM')"><i class="fas fa-folder-plus"></i> Kelas</button>
-            <button class="btn-action" style="background:var(--warning)" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Cetak PDF</button>
-            <button class="btn-action" style="background:var(--dark)" onclick="exportCSV()"><i class="fas fa-download"></i> Backup CSV</button>
-            <button class="btn-action" style="background:var(--danger); border:2px solid white" onclick="openM('resetM')"><i class="fas fa-sync-alt"></i> Reset Skor</button>
-            <button class="btn-action" style="background:var(--danger)" onclick="delClass()"><i class="fas fa-trash"></i> Buang Kelas</button>
-            <button class="btn-action" style="background:var(--dark); grid-column: span 2; margin-top:10px" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout Admin</button>
-        </div>
-
-        <div id="loginArea">
-            <div style="text-align:center; margin-bottom:15px; color:#64748b;"><i class="fas fa-lock fa-3x"></i></div>
-            <input type="password" id="passInput" placeholder="Katalaluan Admin" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px" onkeypress="if(event.key==='Enter') checkLogin()">
-            <button class="btn-action" style="background:var(--primary); width:100%" onclick="checkLogin()">MASUK MOD ADMIN</button>
-        </div>
+<div class="container">
+    <div id="login-box">
+        <h1>ADMIN ACCESS</h1>
+        <input type="password" id="pass" placeholder="Masukkan Password">
+        <button onclick="login()">LOGIN</button>
     </div>
 
-    <div class="main-content">
-        <div class="tabs-container" id="tabContainer"></div>
-        
-        <input type="text" id="search" class="search-bar" placeholder="Cari nama pelajar dalam kelas ini..." onkeyup="refresh()">
+    <div id="panel">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h1 style="margin:0;">Dashboard</h1>
+            <button onclick="logout()" style="width:auto; background:#475569; font-size:0.8rem;">Logout</button>
+        </div>
 
-        <div style="overflow-x: auto;">
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th style="width: 40px">No</th>
-                        <th>Maklumat Pelajar</th>
-                        <th style="text-align:center; width: 60px">Skor</th>
-                        <th id="thAction" style="display:none">Kawalan Merit (Kiri) / Demerit (Kanan)</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="card">
+            <h2><i class="fas fa-user-edit"></i> Kemaskini Markah</h2>
+            <label>NAMA PELAJAR</label>
+            <input type="text" id="pName" placeholder="Contoh: Ahmad Ali">
+            
+            <label>KELAS</label>
+            <select id="pClass">
+                <option value="1 AL-RAZI">1 AL-RAZI</option>
+                <option value="1 AL-FARABI">1 AL-FARABI</option>
+                <option value="2 IBNU SINA">2 IBNU SINA</option>
+                <option value="2 IBNU KHALDUN">2 IBNU KHALDUN</option>
+            </select>
+            
+            <label>JUMLAH MARKAH BARU</label>
+            <input type="number" id="pScore" placeholder="Contoh: 50">
+            
+            <button onclick="submitData('update')">SIMPAN DATA</button>
+        </div>
+
+        <div class="card" style="border-color:#7f1d1d;">
+            <h2 style="color:#ef4444;"><i class="fas fa-trash"></i> Padam Pelajar</h2>
+            <label>NAMA PELAJAR (Mesti Tepat)</label>
+            <input type="text" id="dName" placeholder="Nama untuk dipadam...">
+            <button class="btn-del" onclick="submitData('delete')">PADAM REKOD</button>
         </div>
     </div>
 </div>
 
-<div id="addM" class="overlay"><div class="modal">
-    <h3>Tambah Pelajar</h3>
-    <input type="text" id="newName" placeholder="Nama Penuh Pelajar" onkeypress="if(event.key==='Enter') saveNew()">
-    <button class="btn-action" style="background:var(--success); width:100%" onclick="saveNew()">Simpan Pelajar</button>
-    <button class="btn-action" style="background:#ccc; width:100%; margin-top:10px; color:black" onclick="closeM('addM')">Batal</button>
-</div></div>
-
-<div id="addClassM" class="overlay"><div class="modal">
-    <h3>Tambah Kelas Baru</h3>
-    <input type="text" id="newClassName" placeholder="Contoh: 4 SETIA" onkeypress="if(event.key==='Enter') saveNewClass()">
-    <button class="btn-action" style="background:var(--info); width:100%" onclick="saveNewClass()">Tambah Kelas</button>
-    <button class="btn-action" style="background:#ccc; width:100%; margin-top:10px; color:black" onclick="closeM('addClassM')">Batal</button>
-</div></div>
-
-<div id="resetM" class="overlay"><div class="modal" style="border-top: 10px solid var(--danger);">
-    <h3 style="color:var(--danger)">PENGESAHAN RESET</h3>
-    <p>Kosongkan semua skor untuk kelas: <br><b id="resetClassName" style="font-size:1.2rem"></b>?</p>
-    <button class="btn-action" style="background:var(--danger); width:100%" onclick="confirmReset()">Ya, Reset Skor</button>
-    <button class="btn-action" style="background:#ccc; width:100%; margin-top:10px; color:black" onclick="closeM('resetM')">Batal</button>
-</div></div>
+<div id="toast">Berjaya disimpan!</div>
 
 <script>
-    const CLOUD_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
-    // PASSWORD TELAH DI-ENCODE (Base64) SUPAYA LEBIH SELAMAT DARIPADA PLAIN TEXT
-    // Password Asal: apipfathan@123
-    const SECRET_KEY = "YXBpcGZhdGhhbkAxMjM="; 
-    const STORAGE_KEY = "ARABIC_DESKTOP_DB";
-    
-    let db = [];
-    let classes = [];
-    let activeCls = "";
-    let isAdmin = false;
-    let chart;
+    // --- LINK SCRIPT TUAN (AUTOMATIK) ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
 
-    async function init() {
-        const local = localStorage.getItem(STORAGE_KEY);
-        if(local) { db = JSON.parse(local); updateClassList(); refresh(); }
-        await loadCloud();
-        initSortable();
-    }
-
-    async function loadCloud() {
-        try {
-            const res = await fetch(CLOUD_URL);
-            const data = await res.json();
-            if(data.length > 0) {
-                db = data.map(r => ({ n: String(r[0]), s: parseInt(r[1]) || 0, c: String(r[2]) }));
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-                updateClassList();
-                status("● Cloud Connected", "color:var(--success)");
-            }
-            refresh();
-        } catch (e) { status("● Offline Mode", "color:var(--warning)"); }
-    }
-
-    async function sync() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-        let sortedDB = [];
-        classes.forEach(c => { sortedDB = [...sortedDB, ...db.filter(s => s.c === c)]; });
-        const rows = sortedDB.map(p => [p.n, p.s, p.c]);
-        try {
-            await fetch(CLOUD_URL + "?action=update", { method: "POST", mode: 'no-cors', body: JSON.stringify(rows) });
-            status("● Cloud Synced", "color:var(--success)");
-        } catch (e) { status("● Sync Error", "color:var(--danger)"); }
-    }
-
-    function updateClassList() {
-        const currentClasses = [...new Set(db.map(x => x.c))];
-        if(classes.length === 0) classes = currentClasses;
-        else {
-            currentClasses.forEach(c => { if(!classes.includes(c)) classes.push(c); });
-            classes = classes.filter(c => currentClasses.includes(c));
-        }
-        if(classes.length === 0) classes = ["1 SETIA"];
-        if(!activeCls || !classes.includes(activeCls)) activeCls = classes[0];
-        renderTabs();
-    }
-
-    function initSortable() {
-        new Sortable(document.getElementById('tabContainer'), {
-            animation: 150,
-            ghostClass: 'sortable-ghost',
-            onEnd: function() {
-                classes = Array.from(document.getElementById('tabContainer').children).map(b => b.innerText);
-                sync();
-            }
-        });
-    }
-
-    function getRank(s) {
-        if(s >= 100) return { l:"KHALIFAH", c:"#8b5cf6", i:"fa-crown" };
-        if(s >= 60) return { l:"ELITE", c:"#fbbf24", i:"fa-star" };
-        if(s >= 30) return { l:"PRO", c:"#3b82f6", i:"fa-user-shield" };
-        return { l:"NEWBIE", c:"#10b981", i:"fa-user" };
-    }
-
-    function refresh() {
-        const q = document.getElementById('search').value.toUpperCase();
-        const tbody = document.querySelector('#dataTable tbody');
-        tbody.innerHTML = "";
-        let list = db.filter(x => x.c === activeCls).sort((a,b) => b.s - a.s);
-        
-        list.forEach((p, idx) => {
-            if(!p.n.includes(q)) return;
-            const rank = getRank(p.s);
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td style="color:#94a3b8; font-weight:bold">${idx+1}</td>
-                <td>
-                    <div style="font-weight:700">${p.n}</div>
-                    <span class="rank-tag" style="background:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</span>
-                </td>
-                <td style="text-align:center;">
-                    <div id="score-${idx}" style="font-size:1.3rem; font-weight:800; color:${p.s<0?'red':'var(--primary)'}">${p.s}</div>
-                </td>
-                ${isAdmin ? `<td>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <div class="score-btns">
-                            <button class="btn-pts" style="background:#065f46" onclick="mod('${p.n}', 5, ${idx})">Siap (+5)</button>
-                            <button class="btn-pts" style="background:#059669" onclick="mod('${p.n}', 3, ${idx})">Hafal (+3)</button>
-                            <button class="btn-pts" style="background:#0ea5e9" onclick="mod('${p.n}', 1, ${idx})">Ganjaran (+1)</button>
-                            
-                            <button class="btn-pts" style="background:#991b1b" onclick="mod('${p.n}', -5, ${idx})">T.Siap (-5)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -3, ${idx})">T.Hafal (-3)</button>
-                            <button class="btn-pts" style="background:#f43f5e" onclick="mod('${p.n}', -1, ${idx})">Tolak (-1)</button>
-                            
-                            <button class="btn-pts" style="background:#1e293b; grid-column: span 3" onclick="mod('${p.n}', -12, ${idx})">PONTENG (-12)</button>
-                        </div>
-                        <button onclick="delStu('${p.n}')" style="border:none; background:none; color:var(--danger); cursor:pointer; font-size:1.1rem"><i class="fas fa-trash-alt"></i></button>
-                    </div>
-                </td>` : ''}
-            `;
-            tbody.appendChild(tr);
-        });
-        updateChart(list.slice(0,5));
-        updateStats(list);
-    }
-
-    function mod(n, v, idx) {
-        const p = db.find(x => x.n === n && x.c === activeCls);
-        if(p) { 
-            p.s += v; 
-            refresh(); 
-            sync(); 
-            
-            // Visual Updates (Toast & Animasi)
-            showToast(`${n}: ${v>0?'+':''}${v}`, v>0 ? 'success':'danger');
-            
-            // Animasi Nombor (Pop Effect)
-            const el = document.getElementById(`score-${idx}`);
-            if(el) {
-                el.classList.remove('pop-anim');
-                void el.offsetWidth; // trigger reflow
-                el.classList.add('pop-anim');
-            }
-        }
-    }
-
-    function showToast(msg, type) {
-        const c = document.getElementById('toast-container');
-        const t = document.createElement('div');
-        t.className = `toast ${type}`;
-        t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`;
-        c.appendChild(t);
-        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(), 300) }, 2000);
-    }
-
-    function delStu(n) {
-        if(confirm(`Padam pelajar ${n}?`)) { db = db.filter(x => !(x.n === n && x.c === activeCls)); refresh(); sync(); showToast("Pelajar dipadam", "danger"); }
-    }
-
-    function delClass() {
-        if(confirm(`AWAS! Padam KELAS ${activeCls} dan SEMUA pelajar di dalamnya secara kekal?`)) {
-            db = db.filter(x => x.c !== activeCls);
-            activeCls = ""; updateClassList(); refresh(); sync();
-        }
-    }
-
-    function confirmReset() {
-        db.forEach(p => { if(p.c === activeCls) p.s = 0; });
-        refresh(); sync(); closeM('resetM'); showToast("Markah di-reset", "danger");
-    }
-
-    function updateChart(data) {
-        const ctx = document.getElementById('sideChart').getContext('2d');
-        if(chart) chart.destroy();
-        chart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: data.map(x => x.n.split(' ')[0]),
-                datasets: [{ data: data.map(x => x.s), backgroundColor: ['#fbbf24','#94a3b8','#cd7f32','#4f46e5','#6366f1'], borderWeight: 0 }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } } } }
-        });
-    }
-
-    function updateStats(list) {
-        let m = 0, d = 0;
-        list.forEach(p => { if(p.s > 0) m += p.s; else d += Math.abs(p.s); });
-        document.getElementById('mSum').innerText = m;
-        document.getElementById('dSum').innerText = d;
-    }
-
-    function checkLogin() {
-        const inputPass = document.getElementById('passInput').value;
-        // Guna 'btoa' untuk tukar input ke Base64 dan bandingkan
-        if(btoa(inputPass) === SECRET_KEY) {
-            isAdmin = true;
-            document.getElementById('loginArea').style.display = 'none';
-            document.getElementById('controlPanel').style.display = 'grid';
-            document.getElementById('thAction').style.display = 'table-cell';
-            showToast("Log Masuk Berjaya", "success");
-            refresh();
+    function login() {
+        const p = document.getElementById('pass').value;
+        if(p === "admin123") { // Password Cikgu
+            document.getElementById('login-box').style.display = 'none';
+            document.getElementById('panel').style.display = 'block';
         } else {
-            showToast("Katalaluan Salah!", "danger");
-            document.getElementById('passInput').classList.add('pop-anim');
-            setTimeout(() => document.getElementById('passInput').classList.remove('pop-anim'), 300);
+            alert("Password Salah!");
         }
     }
 
     function logout() { location.reload(); }
-    function renderTabs() { document.getElementById('tabContainer').innerHTML = classes.map(c => `<button class="tab-btn ${c===activeCls?'active':''}" onclick="setCls('${c}')">${c}</button>`).join(''); }
-    function setCls(c) { activeCls = c; renderTabs(); refresh(); }
-    function status(m, s) { const el = document.getElementById('syncStatus'); el.innerText = m; el.style = s; }
-    
-    function openM(id) { 
-        if(id === 'resetM') document.getElementById('resetClassName').innerText = activeCls;
-        document.getElementById(id).style.display = 'flex'; 
-    }
-    function closeM(id) { document.getElementById(id).style.display = 'none'; }
 
-    function saveNew() {
-        const n = document.getElementById('newName').value.toUpperCase().trim();
-        if(n) { db.push({n, s:0, c:activeCls}); sync(); refresh(); closeM('addM'); document.getElementById('newName').value=""; showToast("Pelajar Ditambah", "success"); }
+    function submitData(action) {
+        const btn = document.querySelector('button');
+        const origText = btn.innerText;
+        btn.innerText = "Processing...";
+        btn.disabled = true;
+
+        let data = {};
+        
+        if(action === 'update') {
+            const name = document.getElementById('pName').value.trim().toUpperCase(); 
+            const cls = document.getElementById('pClass').value;
+            const score = document.getElementById('pScore').value;
+            if(!name || !score) { alert("Sila isi semua info!"); btn.disabled=false; btn.innerText=origText; return; }
+            data = { action: "add", name: name, class: cls, score: score };
+        } 
+        else if(action === 'delete') {
+            const name = document.getElementById('dName').value.trim().toUpperCase();
+            if(!name) { alert("Isi nama dulu!"); btn.disabled=false; btn.innerText=origText; return; }
+            if(!confirm("Betul nak padam " + name + "?")) { btn.disabled=false; btn.innerText=origText; return; }
+            data = { action: "delete", name: name };
+        }
+
+        fetch(API_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(() => {
+            showToast(action === 'delete' ? "Rekod Dipadam!" : "Markah Disimpan!");
+            // Clear input fields
+            document.getElementById('pName').value = '';
+            document.getElementById('pScore').value = '';
+            document.getElementById('dName').value = '';
+            btn.disabled = false;
+            btn.innerText = origText;
+        }).catch(err => {
+            alert("Error: " + err);
+            btn.disabled = false;
+            btn.innerText = origText;
+        });
     }
 
-    function saveNewClass() {
-        const c = document.getElementById('newClassName').value.toUpperCase().trim();
-        if(c && !classes.includes(c)) { db.push({n: "PELAJAR PERTAMA", s:0, c:c}); activeCls = c; updateClassList(); sync(); refresh(); closeM('addClassM'); showToast("Kelas Ditambah", "info"); }
-    }
-
-    function exportPDF() {
-        const { jsPDF } = window.jspdf; const d = new jsPDF();
-        d.text(`LAPORAN MERIT: ${activeCls}`, 14, 15);
-        d.autoTable({ head:[['No','Nama','Skor','Rank']], body: db.filter(x=>x.c===activeCls).sort((a,b)=>b.s-a.s).map((p,i)=>[i+1, p.n, p.s, getRank(p.s).l]), startY: 20 });
-        d.save(`Laporan_${activeCls}.pdf`);
-        showToast("PDF Dimuat Turun", "success");
-    }
-
-    function exportCSV() {
-        let csv = "Nama,Skor,Kelas\n" + db.map(p => `"${p.n}",${p.s},${p.c}`).join("\n");
-        const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
-        a.download = `Backup_Master.csv`; a.click();
-        showToast("CSV Dimuat Turun", "success");
+    function showToast(msg) {
+        const x = document.getElementById("toast");
+        x.innerText = msg;
+        x.className = "show";
+        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
     }
 </script>
+
 </body>
 </html>
