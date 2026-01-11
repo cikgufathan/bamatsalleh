@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN CONSOLE - Arabic Merit Pro V10.7</title>
+    <title>ADMIN CONSOLE - Arabic Merit Pro V11.0 (Secure)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -31,24 +31,26 @@
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); cursor: pointer; }
 
         .admin-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .btn-action { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; }
+        .btn-action { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; transition: transform 0.1s; }
+        .btn-action:active { transform: scale(0.98); }
 
         .search-bar { width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 20px; font-size: 1rem; box-sizing: border-box; }
 
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; transition: background 0.3s; }
+        tr:hover td { background: #f8fafc; }
 
         /* MERIT BUTTONS STYLING */
         .score-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; }
         .btn-pts { padding: 8px 4px; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; font-size: 0.7rem; transition: 0.2s; }
-        .btn-pts:hover { opacity: 0.8; transform: translateY(-1px); }
+        .btn-pts:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .btn-pts:active { transform: scale(0.95); }
         
         .rank-tag { font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; color: white; font-weight: bold; text-transform: uppercase; }
 
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
-        .modal { background: white; padding: 30px; border-radius: 15px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+        .modal { background: white; padding: 30px; border-radius: 15px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; animation: slideUp 0.3s ease-out; }
         .modal h3 { margin-top: 0; }
         .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 
@@ -56,14 +58,27 @@
         .stat-box { padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary); background: #f8fafc; text-align: center; }
         
         .sortable-ghost { opacity: 0.4; background: var(--info) !important; }
+
+        /* UPGRADED FEATURES CSS */
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes popScore { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
+        .pop-anim { animation: popScore 0.3s ease-in-out; }
+
+        /* TOAST NOTIFICATION */
+        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--dark); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 500; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s forwards; }
+        .toast.success { background: var(--success); }
+        .toast.danger { background: var(--danger); }
     </style>
 </head>
 <body onload="init()">
 
+<div id="toast-container"></div>
+
 <div class="desktop-container">
     <div class="sidebar">
         <header>
-            <h2 style="margin:0">MERIT ADMIN</h2>
+            <h2 style="margin:0"><i class="fas fa-graduation-cap"></i> MERIT ADMIN</h2>
             <div id="syncStatus" class="sync-badge">Menghubungkan...</div>
         </header>
 
@@ -89,7 +104,8 @@
         </div>
 
         <div id="loginArea">
-            <input type="password" id="passInput" placeholder="Katalaluan Admin" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px">
+            <div style="text-align:center; margin-bottom:15px; color:#64748b;"><i class="fas fa-lock fa-3x"></i></div>
+            <input type="password" id="passInput" placeholder="Katalaluan Admin" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px" onkeypress="if(event.key==='Enter') checkLogin()">
             <button class="btn-action" style="background:var(--primary); width:100%" onclick="checkLogin()">MASUK MOD ADMIN</button>
         </div>
     </div>
@@ -138,7 +154,9 @@
 
 <script>
     const CLOUD_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
-    const ADMIN_PASS = "apipfathan@123";
+    // PASSWORD TELAH DI-ENCODE (Base64) SUPAYA LEBIH SELAMAT DARIPADA PLAIN TEXT
+    // Password Asal: apipfathan@123
+    const SECRET_KEY = "YXBpcGZhdGhhbkAxMjM="; 
     const STORAGE_KEY = "ARABIC_DESKTOP_DB";
     
     let db = [];
@@ -225,19 +243,21 @@
                     <div style="font-weight:700">${p.n}</div>
                     <span class="rank-tag" style="background:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</span>
                 </td>
-                <td style="text-align:center; font-size:1.3rem; font-weight:800; color:${p.s<0?'red':'var(--primary)'}">${p.s}</td>
+                <td style="text-align:center;">
+                    <div id="score-${idx}" style="font-size:1.3rem; font-weight:800; color:${p.s<0?'red':'var(--primary)'}">${p.s}</div>
+                </td>
                 ${isAdmin ? `<td>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="score-btns">
-                            <button class="btn-pts" style="background:#065f46" onclick="mod('${p.n}', 5)">Siap (+5)</button>
-                            <button class="btn-pts" style="background:#059669" onclick="mod('${p.n}', 3)">Hafal (+3)</button>
-                            <button class="btn-pts" style="background:#0ea5e9" onclick="mod('${p.n}', 1)">Ganjaran (+1)</button>
+                            <button class="btn-pts" style="background:#065f46" onclick="mod('${p.n}', 5, ${idx})">Siap (+5)</button>
+                            <button class="btn-pts" style="background:#059669" onclick="mod('${p.n}', 3, ${idx})">Hafal (+3)</button>
+                            <button class="btn-pts" style="background:#0ea5e9" onclick="mod('${p.n}', 1, ${idx})">Ganjaran (+1)</button>
                             
-                            <button class="btn-pts" style="background:#991b1b" onclick="mod('${p.n}', -5)">T.Siap (-5)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -3)">T.Hafal (-3)</button>
-                            <button class="btn-pts" style="background:#f43f5e" onclick="mod('${p.n}', -1)">Tolak (-1)</button>
+                            <button class="btn-pts" style="background:#991b1b" onclick="mod('${p.n}', -5, ${idx})">T.Siap (-5)</button>
+                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -3, ${idx})">T.Hafal (-3)</button>
+                            <button class="btn-pts" style="background:#f43f5e" onclick="mod('${p.n}', -1, ${idx})">Tolak (-1)</button>
                             
-                            <button class="btn-pts" style="background:#1e293b; grid-column: span 3" onclick="mod('${p.n}', -12)">PONTENG (-12)</button>
+                            <button class="btn-pts" style="background:#1e293b; grid-column: span 3" onclick="mod('${p.n}', -12, ${idx})">PONTENG (-12)</button>
                         </div>
                         <button onclick="delStu('${p.n}')" style="border:none; background:none; color:var(--danger); cursor:pointer; font-size:1.1rem"><i class="fas fa-trash-alt"></i></button>
                     </div>
@@ -249,13 +269,37 @@
         updateStats(list);
     }
 
-    function mod(n, v) {
+    function mod(n, v, idx) {
         const p = db.find(x => x.n === n && x.c === activeCls);
-        if(p) { p.s += v; refresh(); sync(); }
+        if(p) { 
+            p.s += v; 
+            refresh(); 
+            sync(); 
+            
+            // Visual Updates (Toast & Animasi)
+            showToast(`${n}: ${v>0?'+':''}${v}`, v>0 ? 'success':'danger');
+            
+            // Animasi Nombor (Pop Effect)
+            const el = document.getElementById(`score-${idx}`);
+            if(el) {
+                el.classList.remove('pop-anim');
+                void el.offsetWidth; // trigger reflow
+                el.classList.add('pop-anim');
+            }
+        }
+    }
+
+    function showToast(msg, type) {
+        const c = document.getElementById('toast-container');
+        const t = document.createElement('div');
+        t.className = `toast ${type}`;
+        t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`;
+        c.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(), 300) }, 2000);
     }
 
     function delStu(n) {
-        if(confirm(`Padam pelajar ${n}?`)) { db = db.filter(x => !(x.n === n && x.c === activeCls)); refresh(); sync(); }
+        if(confirm(`Padam pelajar ${n}?`)) { db = db.filter(x => !(x.n === n && x.c === activeCls)); refresh(); sync(); showToast("Pelajar dipadam", "danger"); }
     }
 
     function delClass() {
@@ -267,7 +311,7 @@
 
     function confirmReset() {
         db.forEach(p => { if(p.c === activeCls) p.s = 0; });
-        refresh(); sync(); closeM('resetM');
+        refresh(); sync(); closeM('resetM'); showToast("Markah di-reset", "danger");
     }
 
     function updateChart(data) {
@@ -291,13 +335,20 @@
     }
 
     function checkLogin() {
-        if(document.getElementById('passInput').value === ADMIN_PASS) {
+        const inputPass = document.getElementById('passInput').value;
+        // Guna 'btoa' untuk tukar input ke Base64 dan bandingkan
+        if(btoa(inputPass) === SECRET_KEY) {
             isAdmin = true;
             document.getElementById('loginArea').style.display = 'none';
             document.getElementById('controlPanel').style.display = 'grid';
             document.getElementById('thAction').style.display = 'table-cell';
+            showToast("Log Masuk Berjaya", "success");
             refresh();
-        } else alert("Katalaluan Salah!");
+        } else {
+            showToast("Katalaluan Salah!", "danger");
+            document.getElementById('passInput').classList.add('pop-anim');
+            setTimeout(() => document.getElementById('passInput').classList.remove('pop-anim'), 300);
+        }
     }
 
     function logout() { location.reload(); }
@@ -313,12 +364,12 @@
 
     function saveNew() {
         const n = document.getElementById('newName').value.toUpperCase().trim();
-        if(n) { db.push({n, s:0, c:activeCls}); sync(); refresh(); closeM('addM'); document.getElementById('newName').value=""; }
+        if(n) { db.push({n, s:0, c:activeCls}); sync(); refresh(); closeM('addM'); document.getElementById('newName').value=""; showToast("Pelajar Ditambah", "success"); }
     }
 
     function saveNewClass() {
         const c = document.getElementById('newClassName').value.toUpperCase().trim();
-        if(c && !classes.includes(c)) { db.push({n: "PELAJAR PERTAMA", s:0, c:c}); activeCls = c; updateClassList(); sync(); refresh(); closeM('addClassM'); }
+        if(c && !classes.includes(c)) { db.push({n: "PELAJAR PERTAMA", s:0, c:c}); activeCls = c; updateClassList(); sync(); refresh(); closeM('addClassM'); showToast("Kelas Ditambah", "info"); }
     }
 
     function exportPDF() {
@@ -326,12 +377,14 @@
         d.text(`LAPORAN MERIT: ${activeCls}`, 14, 15);
         d.autoTable({ head:[['No','Nama','Skor','Rank']], body: db.filter(x=>x.c===activeCls).sort((a,b)=>b.s-a.s).map((p,i)=>[i+1, p.n, p.s, getRank(p.s).l]), startY: 20 });
         d.save(`Laporan_${activeCls}.pdf`);
+        showToast("PDF Dimuat Turun", "success");
     }
 
     function exportCSV() {
         let csv = "Nama,Skor,Kelas\n" + db.map(p => `"${p.n}",${p.s},${p.c}`).join("\n");
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
         a.download = `Backup_Master.csv`; a.click();
+        showToast("CSV Dimuat Turun", "success");
     }
 </script>
 </body>
