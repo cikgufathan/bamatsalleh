@@ -365,8 +365,24 @@
     }
 
     function logout() { location.reload(); }
-    function renderTabs() { document.getElementById('tabContainer').innerHTML = classes.map(c => `<button class="tab-btn ${c===activeCls?'active':''}" onclick="setCls('${c}')">${c}</button>`).join(''); }
-    function setCls(c) { activeCls = c; renderTabs(); refresh(); }
+    
+    function renderTabs() { 
+        document.getElementById('tabContainer').innerHTML = classes.map(c => `<button class="tab-btn ${c===activeCls?'active':''}" onclick="setCls('${c}')">${c}</button>`).join(''); 
+    }
+    
+    // FUNGSI INI TELAH DIOPTIMUMKAN UNTUK KELANCARAN (SMOOTHNESS)
+    function setCls(c) { 
+        activeCls = c;
+        // Kita tidak lagi memanggil renderTabs() di sini untuk elak kelip & scroll reset
+        // Kita hanya update class secara manual
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => {
+            if(btn.innerText === c) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        refresh(); 
+    }
+    
     function status(m, s) { const el = document.getElementById('syncStatus'); el.innerText = m; el.style = s; }
     
     function openM(id) { 
