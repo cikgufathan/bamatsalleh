@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hall of Fame - Arabic Merit</title>
     
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -100,8 +103,11 @@
 
         /* Modal */
         #card-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .player-card { background: linear-gradient(135deg, #1e1b4b, #0f172a); width: 85%; max-width: 320px; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); text-align: center; }
+        .player-card { background: linear-gradient(135deg, #1e1b4b, #0f172a); width: 85%; max-width: 320px; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); text-align: center; position: relative; }
         .pc-score { font-size: 4rem; font-family: 'Orbitron'; color: var(--gold); margin: 10px 0; font-weight: 900; text-shadow: 0 0 20px var(--gold); }
+        
+        /* Logo dalam Card */
+        .card-logo { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; }
     </style>
 </head>
 <body onload="init()">
@@ -112,7 +118,9 @@
 </div>
 
 <div id="start-screen">
-    <div style="font-size:3rem; color:var(--gold); margin-bottom:20px;"><i class="fas fa-crown"></i></div>
+    <img src="logo.png" style="width:100px; height:100px; margin-bottom:20px; border-radius:50%; box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);" onerror="this.style.display='none'; document.getElementById('backup-icon').style.display='block'">
+    <div id="backup-icon" style="display:none; font-size:3rem; color:var(--gold); margin-bottom:20px;"><i class="fas fa-crown"></i></div>
+    
     <h1 style="font-size:1.5rem; color:#94a3b8; letter-spacing:2px; margin:0;">ARABIC MERIT</h1>
     <h2 style="font-size:2.5rem; margin:5px 0; font-family:'Orbitron'">HALL OF FAME</h2>
     <div style="margin-bottom:10px; color:#64748b; font-size:0.8rem;">Tap untuk mulakan</div>
@@ -120,10 +128,11 @@
 </div>
 
 <audio id="bgm" preload="auto" loop>
-    <source src="music.mp3" type="audio/mpeg" onerror="audioError()">
+    <source src="music.mp3" type="audio/mpeg" onerror="console.log('Music not found')">
 </audio>
 
 <header>
+    <img src="logo.png" style="width:50px; margin-bottom:10px; border-radius:50%;" onerror="this.style.display='none'">
     <h1>HALL OF FAME</h1>
     <div style="color:var(--neon); letter-spacing:3px; font-weight:bold; font-size:0.8rem; margin-top:5px;">PEJUANG BAHASA ARAB</div>
 </header>
@@ -143,6 +152,8 @@
 
 <div id="card-modal" onclick="closeCard()">
     <div class="player-card" id="capture-area" onclick="event.stopPropagation()">
+        <img src="logo.png" class="card-logo" onerror="this.style.display='none'">
+        
         <div id="m-rank-badge" style="color:var(--gold); font-family:'Orbitron'; letter-spacing:2px; margin-bottom:10px;">KHALIFAH</div>
         <i id="m-rank-icon" class="fas fa-crown" style="font-size: 3rem; color:white; margin:10px 0;"></i>
         <div id="m-name" style="font-size: 1.3rem; font-weight: 800; color:white; margin-top:10px;">NAMA</div>
@@ -188,12 +199,6 @@
         setTimeout(() => btn.classList.remove('spinning'), 500);
     }
 
-    // --- AUDIO SYSTEM (MP3) ---
-    
-    function audioError() {
-        alert("ALERT: Fail 'music.mp3' tidak dijumpai di GitHub!\n\nSila pastikan:\n1. Fail telah diupload.\n2. Ejaan nama fail ialah 'music.mp3' (huruf kecil).");
-    }
-
     function enterArena() {
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('audioPanel').classList.add('visible');
@@ -201,18 +206,10 @@
         const bgm = document.getElementById('bgm');
         bgm.volume = lastVol;
         
-        // Browser Policy Requirement: Play audio immediately on click
         var playPromise = bgm.play();
-
         if (playPromise !== undefined) {
-            playPromise.then(_ => {
-                console.log("Audio playing (music.mp3).");
-            })
-            .catch(error => {
-                console.log("Audio Error: " + error);
-                // Jika file wujud tapi browser block
-                alert("Muzik wujud tapi diblock oleh phone.\n\nSila pastikan 'Silent Mode' (Suis Tepi iPhone) dimatikan.");
-            });
+            playPromise.then(_ => { console.log("Audio playing (music.mp3)."); })
+            .catch(error => { console.log("Audio Error: " + error); alert("Muzik wujud tapi diblock oleh phone.\n\nSila pastikan 'Silent Mode' dimatikan."); });
         }
         
         playSound();
@@ -220,67 +217,36 @@
     }
 
     function toggleMute() { 
-        const bgm = document.getElementById('bgm');
-        isMuted = !isMuted;
-        
-        if(isMuted) {
-            bgm.pause();
-            document.getElementById('muteIcon').className = "fas fa-volume-mute";
-            document.getElementById('volSlider').value = 0;
-        } else {
-            bgm.play();
-            bgm.volume = lastVol;
-            document.getElementById('muteIcon').className = "fas fa-volume-up";
-            document.getElementById('volSlider').value = lastVol;
-        }
+        const bgm = document.getElementById('bgm'); isMuted = !isMuted;
+        if(isMuted) { bgm.pause(); document.getElementById('muteIcon').className = "fas fa-volume-mute"; document.getElementById('volSlider').value = 0; } 
+        else { bgm.play(); bgm.volume = lastVol; document.getElementById('muteIcon').className = "fas fa-volume-up"; document.getElementById('volSlider').value = lastVol; }
     }
 
     function adjustVolume(v) {
-        const bgm = document.getElementById('bgm');
-        bgm.volume = v;
-        lastVol = v;
-        
-        if(v > 0 && isMuted) {
-            isMuted = false;
-            bgm.play();
-            document.getElementById('muteIcon').className = "fas fa-volume-up";
-        } else if (v == 0) {
-            isMuted = true;
-            document.getElementById('muteIcon').className = "fas fa-volume-mute";
-        }
+        const bgm = document.getElementById('bgm'); bgm.volume = v; lastVol = v;
+        if(v > 0 && isMuted) { isMuted = false; bgm.play(); document.getElementById('muteIcon').className = "fas fa-volume-up"; } 
+        else if (v == 0) { isMuted = true; document.getElementById('muteIcon').className = "fas fa-volume-mute"; }
     }
 
-    function playSound() { 
-        if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } 
-    }
+    function playSound() { if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } }
 
-    // --- RENDERING ---
     function renderTabs() {
         document.getElementById('tabs').innerHTML = classes.map(c => 
             `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
         ).join('');
     }
 
-    function setCl(c) {
-        activeCl = c;
-        playSound();
-        renderTabs();
-        renderList();
-    }
+    function setCl(c) { activeCl = c; playSound(); renderTabs(); renderList(); }
 
     function renderList() {
         const q = document.getElementById('search').value.toLowerCase();
         let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
         
-        const pod = document.getElementById('podium');
-        pod.innerHTML = "";
-        const top3 = list.slice(0,3);
-        const order = [1,0,2]; 
+        const pod = document.getElementById('podium'); pod.innerHTML = "";
+        const top3 = list.slice(0,3); const order = [1,0,2]; 
         order.forEach(i => {
             if(top3[i]) {
-                const p = top3[i];
-                const rank = i+1;
-                const icons = ['👑','🥈','🥉'];
+                const p = top3[i]; const rank = i+1; const icons = ['👑','🥈','🥉'];
                 pod.innerHTML += `<div class="podium-card r-${rank}" onclick="showCard('${p.n}',${p.s})">
                     <div style="font-size:2rem; margin-bottom:5px;">${icons[i]}</div>
                     <div class="p-score">${p.s}</div>
@@ -289,21 +255,15 @@
             }
         });
 
-        const cont = document.getElementById('list');
-        cont.innerHTML = "";
+        const cont = document.getElementById('list'); cont.innerHTML = "";
         list.forEach((p, i) => {
             if(q && !p.n.toLowerCase().includes(q)) return;
-            const rank = getRank(p.s);
-            const isTop3 = i < 3;
+            const rank = getRank(p.s); const isTop3 = i < 3;
             cont.innerHTML += `<div class="student-row" style="${isTop3?'border-left:3px solid '+rank.c:''}" onclick="showCard('${p.n}',${p.s})">
                 <div style="display:flex; gap:10px; align-items:center;">
                     <span style="color:#64748b; font-family:'Orbitron'; width:25px;">#${i+1}</span>
-                    <div>
-                        <div style="font-weight:700;">${p.n}</div>
-                        <div style="font-size:0.7rem; color:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</div>
-                    </div>
-                </div>
-                <div class="s-score" style="color:${rank.c}">${p.s}</div>
+                    <div><div style="font-weight:700;">${p.n}</div><div style="font-size:0.7rem; color:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</div></div>
+                </div><div class="s-score" style="color:${rank.c}">${p.s}</div>
             </div>`;
         });
     }
@@ -318,19 +278,14 @@
     function showCard(n, s) {
         const r = getRank(s);
         document.getElementById('card-modal').style.display = 'flex';
-        document.getElementById('m-name').innerText = n;
-        document.getElementById('m-score').innerText = s;
-        document.getElementById('m-score').style.color = r.c;
-        document.getElementById('m-rank-badge').innerText = r.l;
-        document.getElementById('m-rank-badge').style.color = r.c;
-        document.getElementById('m-rank-icon').className = `fas ${r.i}`;
-        document.getElementById('m-rank-icon').style.color = r.c;
+        document.getElementById('m-name').innerText = n; document.getElementById('m-score').innerText = s;
+        document.getElementById('m-score').style.color = r.c; document.getElementById('m-rank-badge').innerText = r.l;
+        document.getElementById('m-rank-badge').style.color = r.c; document.getElementById('m-rank-icon').className = `fas ${r.i}`; document.getElementById('m-rank-icon').style.color = r.c;
         
         if(s>=300) document.getElementById('m-desc').innerText = '"Lagenda Bahasa Arab!"';
         else if(s>=150) document.getElementById('m-desc').innerText = '"Pejuang Sejati!"';
         else if(s>=50) document.getElementById('m-desc').innerText = '"Semangat Membara!"';
         else document.getElementById('m-desc').innerText = '"Mula Langkah Pertama!"';
-        
         playSound();
     }
 
