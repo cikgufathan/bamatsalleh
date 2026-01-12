@@ -108,7 +108,7 @@
 
 <div class="audio-panel" id="audioPanel">
     <i class="fas fa-volume-up" id="muteIcon" onclick="toggleMute()"></i>
-    <input type="range" class="vol-slider" id="volSlider" min="0" max="100" step="1" value="40" oninput="adjustVolume(this.value)">
+    <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.1" value="0.5" oninput="adjustVolume(this.value)">
 </div>
 
 <div id="start-screen">
@@ -118,7 +118,9 @@
     <button class="btn-enter" onclick="enterArena()">MASUK ARENA</button>
 </div>
 
-<div id="youtube-audio" style="position:absolute; top:-9999px; left:-9999px; opacity:0; pointer-events:none;"></div>
+<audio id="bgm" loop>
+    <source src="https://cdn.pixabay.com/audio/2023/10/24/audio_3d1a868460.mp3" type="audio/mpeg">
+</audio>
 
 <header>
     <h1>HALL OF FAME</h1>
@@ -150,95 +152,14 @@
     </div>
 </div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
-
 <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
     const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
 
     let db = [], classes = [], activeCl = "";
+    let isMuted = false, lastVol = 0.5;
     let audioCoin = new Audio(COIN_SFX);
 
-    // --- SETUP YOUTUBE PLAYER ---
-    let player;
-    let isPlayerReady = false;
-    let isMuted = false;
-    let lastVol = 40; // Volume asal (0-100)
-
-    function onYouTubeIframeAPIReady() {
-        player = new YT.Player('youtube-audio', {
-            height: '0',
-            width: '0',
-            videoId: 'kuTONPVjr_E', // ID Video Tuan (Toccata and Fugue)
-            playerVars: {
-                'autoplay': 0,
-                'controls': 0,
-                'disablekb': 1,
-                'fs': 0,
-                'loop': 1, // Set loop
-                'playlist': 'kuTONPVjr_E' // Wajib letak ID sama untuk loop berfungsi
-            },
-            events: {
-                'onReady': onPlayerReady
-            }
-        });
-    }
-
-    function onPlayerReady(event) {
-        isPlayerReady = true;
-        player.setVolume(lastVol); // Set volume asal
-    }
-
-    // --- FUNGSI AUDIO UPDATE ---
-    function toggleMute() {
-        if(!isPlayerReady) return;
-        isMuted = !isMuted;
-        
-        if (isMuted) {
-            player.mute();
-            document.getElementById('muteIcon').className = "fas fa-volume-mute";
-            document.getElementById('volSlider').value = 0;
-        } else {
-            player.unMute();
-            player.setVolume(lastVol);
-            document.getElementById('muteIcon').className = "fas fa-volume-up";
-            document.getElementById('volSlider').value = lastVol;
-        }
-    }
-
-    function adjustVolume(val) {
-        if(!isPlayerReady) return;
-        lastVol = val;
-        player.setVolume(val);
-        
-        if(val > 0 && isMuted) {
-            isMuted = false;
-            player.unMute();
-            document.getElementById('muteIcon').className = "fas fa-volume-up";
-        } else if (val == 0) {
-            isMuted = true;
-            document.getElementById('muteIcon').className = "fas fa-volume-mute";
-        }
-    }
-
-    function playSound() { 
-        if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } 
-    }
-
-    function enterArena() {
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('audioPanel').classList.add('visible');
-        
-        // Mula mainkan YouTube Music
-        if(isPlayerReady) {
-            player.playVideo();
-        }
-        
-        playSound();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-    }
-
-    // --- EXISTING LOGIC ---
     function init() {
         fetchData(); 
         setInterval(() => { console.log("Auto-updating..."); fetchData(true); }, 10000); 
@@ -266,6 +187,59 @@
         setTimeout(() => btn.classList.remove('spinning'), 500);
     }
 
+    // --- AUDIO CONTROL ---
+    function enterArena() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('audioPanel').classList.add('visible');
+        
+        // MAIN KAN MUZIK (Guna standard Audio HTML5)
+        const bgm = document.getElementById('bgm');
+        bgm.volume = lastVol;
+        bgm.play().catch(e => {
+            console.log("Audio tersekat, sila tap ikon muzik.");
+            alert("Sila tap butang muzik di atas kanan untuk mulakan lagu.");
+        });
+        
+        playSound();
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+
+    function toggleMute() { 
+        const bgm = document.getElementById('bgm');
+        isMuted = !isMuted;
+        
+        if(isMuted) {
+            bgm.pause();
+            document.getElementById('muteIcon').className = "fas fa-volume-mute";
+            document.getElementById('volSlider').value = 0;
+        } else {
+            bgm.play();
+            bgm.volume = lastVol;
+            document.getElementById('muteIcon').className = "fas fa-volume-up";
+            document.getElementById('volSlider').value = lastVol;
+        }
+    }
+
+    function adjustVolume(v) {
+        const bgm = document.getElementById('bgm');
+        bgm.volume = v;
+        lastVol = v;
+        
+        if(v > 0 && isMuted) {
+            isMuted = false;
+            bgm.play();
+            document.getElementById('muteIcon').className = "fas fa-volume-up";
+        } else if (v == 0) {
+            isMuted = true;
+            document.getElementById('muteIcon').className = "fas fa-volume-mute";
+        }
+    }
+
+    function playSound() { 
+        if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } 
+    }
+
+    // --- RENDERING ---
     function renderTabs() {
         document.getElementById('tabs').innerHTML = classes.map(c => 
             `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
@@ -319,11 +293,12 @@
         });
     }
 
+    // --- RANKING BARU (300/150/50) ---
     function getRank(s) {
-        if(s >= 100) return { l:"KHALIFAH", i:"fa-crown", c:"#fbbf24" };
-        if(s >= 60) return { l:"ELITE", i:"fa-star", c:"#94a3b8" };
-        if(s >= 30) return { l:"PRO", i:"fa-shield-halved", c:"#b45309" };
-        return { l:"NEWBIE", i:"fa-user", c:"#64748b" };
+        if(s >= 300) return { l:"KHALIFAH", c:"#7c3aed", i:"fa-crown" };      // Purple (300+)
+        if(s >= 150) return { l:"ELITE", c:"#f59e0b", i:"fa-medal" };         // Gold (150-299)
+        if(s >= 50) return { l:"PRO", c:"#3b82f6", i:"fa-shield-alt" };       // Blue (50-149)
+        return { l:"NEWBIE", c:"#22c55e", i:"fa-seedling" };                  // Green (<50)
     }
 
     function showCard(n, s) {
@@ -336,9 +311,13 @@
         document.getElementById('m-rank-badge').style.color = r.c;
         document.getElementById('m-rank-icon').className = `fas ${r.i}`;
         document.getElementById('m-rank-icon').style.color = r.c;
-        if(s>=100) document.getElementById('m-desc').innerText = '"Lagenda Bahasa Arab!"';
-        else if(s>=60) document.getElementById('m-desc').innerText = '"Pejuang Sejati!"';
-        else document.getElementById('m-desc').innerText = '"Teruskan Usaha!"';
+        
+        // Ayat Motivasi
+        if(s>=300) document.getElementById('m-desc').innerText = '"Lagenda Bahasa Arab!"';
+        else if(s>=150) document.getElementById('m-desc').innerText = '"Pejuang Sejati!"';
+        else if(s>=50) document.getElementById('m-desc').innerText = '"Semangat Membara!"';
+        else document.getElementById('m-desc').innerText = '"Mula Langkah Pertama!"';
+        
         playSound();
     }
 
