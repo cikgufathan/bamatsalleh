@@ -120,7 +120,7 @@
 </div>
 
 <audio id="bgm" preload="auto" loop>
-    <source src="music.m4a" type="audio/mp4">
+    <source src="music.mp3" type="audio/mpeg" onerror="audioError()">
 </audio>
 
 <header>
@@ -188,7 +188,12 @@
         setTimeout(() => btn.classList.remove('spinning'), 500);
     }
 
-    // --- AUDIO SYSTEM (LOCAL M4A FILE) ---
+    // --- AUDIO SYSTEM (MP3) ---
+    
+    function audioError() {
+        alert("ALERT: Fail 'music.mp3' tidak dijumpai di GitHub!\n\nSila pastikan:\n1. Fail telah diupload.\n2. Ejaan nama fail ialah 'music.mp3' (huruf kecil).");
+    }
+
     function enterArena() {
         document.getElementById('start-screen').style.display = 'none';
         document.getElementById('audioPanel').classList.add('visible');
@@ -196,16 +201,17 @@
         const bgm = document.getElementById('bgm');
         bgm.volume = lastVol;
         
-        // Play local file
+        // Browser Policy Requirement: Play audio immediately on click
         var playPromise = bgm.play();
 
         if (playPromise !== undefined) {
             playPromise.then(_ => {
-                console.log("Audio playing (Local M4A).");
+                console.log("Audio playing (music.mp3).");
             })
             .catch(error => {
                 console.log("Audio Error: " + error);
-                alert("Muzik tak bunyi. Pastikan file 'music.m4a' telah diupload ke GitHub dalam folder yang sama!");
+                // Jika file wujud tapi browser block
+                alert("Muzik wujud tapi diblock oleh phone.\n\nSila pastikan 'Silent Mode' (Suis Tepi iPhone) dimatikan.");
             });
         }
         
