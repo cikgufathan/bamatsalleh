@@ -34,7 +34,7 @@
             border: 1px solid rgba(255,255,255,0.1); transform: translateY(-100px); transition: 0.3s;
         }
         .audio-panel.visible { transform: translateY(0); }
-        .vol-slider { width: 70px; height: 4px; accent-color: var(--gold); }
+        .vol-slider { width: 70px; height: 4px; accent-color: var(--gold); cursor: pointer; }
 
         /* Start Screen */
         #start-screen {
@@ -108,7 +108,7 @@
 
 <div class="audio-panel" id="audioPanel">
     <i class="fas fa-volume-up" id="muteIcon" onclick="toggleMute()"></i>
-    <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.1" value="0.4" oninput="adjustVolume(this.value)">
+    <input type="range" class="vol-slider" id="volSlider" min="0" max="100" step="1" value="40" oninput="adjustVolume(this.value)">
 </div>
 
 <div id="start-screen">
@@ -118,9 +118,7 @@
     <button class="btn-enter" onclick="enterArena()">MASUK ARENA</button>
 </div>
 
-<audio id="bgm" loop>
-    <source src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_0783141b72.mp3" type="audio/mp3">
-</audio>
+<div id="youtube-audio" style="position:absolute; top:-9999px; left:-9999px; opacity:0; pointer-events:none;"></div>
 
 <header>
     <h1>HALL OF FAME</h1>
@@ -152,24 +150,98 @@
     </div>
 </div>
 
+<script src="https://www.youtube.com/iframe_api"></script>
+
 <script>
-    // --- URL SCRIPT YANG SAMA ---
     const API_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
-    
-    // SFX Coin (Embedded)
     const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
 
     let db = [], classes = [], activeCl = "";
-    let isMuted = false, lastVol = 0.4;
     let audioCoin = new Audio(COIN_SFX);
 
+    // --- SETUP YOUTUBE PLAYER ---
+    let player;
+    let isPlayerReady = false;
+    let isMuted = false;
+    let lastVol = 40; // Volume asal (0-100)
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('youtube-audio', {
+            height: '0',
+            width: '0',
+            videoId: 'kuTONPVjr_E', // ID Video Tuan (Toccata and Fugue)
+            playerVars: {
+                'autoplay': 0,
+                'controls': 0,
+                'disablekb': 1,
+                'fs': 0,
+                'loop': 1, // Set loop
+                'playlist': 'kuTONPVjr_E' // Wajib letak ID sama untuk loop berfungsi
+            },
+            events: {
+                'onReady': onPlayerReady
+            }
+        });
+    }
+
+    function onPlayerReady(event) {
+        isPlayerReady = true;
+        player.setVolume(lastVol); // Set volume asal
+    }
+
+    // --- FUNGSI AUDIO UPDATE ---
+    function toggleMute() {
+        if(!isPlayerReady) return;
+        isMuted = !isMuted;
+        
+        if (isMuted) {
+            player.mute();
+            document.getElementById('muteIcon').className = "fas fa-volume-mute";
+            document.getElementById('volSlider').value = 0;
+        } else {
+            player.unMute();
+            player.setVolume(lastVol);
+            document.getElementById('muteIcon').className = "fas fa-volume-up";
+            document.getElementById('volSlider').value = lastVol;
+        }
+    }
+
+    function adjustVolume(val) {
+        if(!isPlayerReady) return;
+        lastVol = val;
+        player.setVolume(val);
+        
+        if(val > 0 && isMuted) {
+            isMuted = false;
+            player.unMute();
+            document.getElementById('muteIcon').className = "fas fa-volume-up";
+        } else if (val == 0) {
+            isMuted = true;
+            document.getElementById('muteIcon').className = "fas fa-volume-mute";
+        }
+    }
+
+    function playSound() { 
+        if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } 
+    }
+
+    function enterArena() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('audioPanel').classList.add('visible');
+        
+        // Mula mainkan YouTube Music
+        if(isPlayerReady) {
+            player.playVideo();
+        }
+        
+        playSound();
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
+
+    // --- EXISTING LOGIC ---
     function init() {
-        fetchData(); // Load first time
-        // AUTO REFRESH SETIAP 10 SAAT
-        setInterval(() => {
-            console.log("Auto-updating...");
-            fetchData(true); // true = silent update
-        }, 10000); 
+        fetchData(); 
+        setInterval(() => { console.log("Auto-updating..."); fetchData(true); }, 10000); 
     }
 
     async function fetchData(isSilent = false) {
@@ -178,17 +250,12 @@
             const data = await res.json();
             db = data.map(x => ({ n: String(x[0]), s: parseInt(x[1]) || 0, c: String(x[2]) }));
             
-            // Extract Classes
             const prevClass = activeCl;
             classes = [...new Set(db.map(x => x.c))];
             if(!activeCl && classes.length > 0) activeCl = classes[0];
 
             renderTabs();
             renderList();
-            
-            if(!isSilent && document.getElementById('start-screen').style.display === 'none') {
-                // Optional: Toast notification for update
-            }
         } catch (e) { console.error("Connection error"); }
     }
 
@@ -197,18 +264,6 @@
         if(navigator.vibrate) navigator.vibrate(30);
         await fetchData();
         setTimeout(() => btn.classList.remove('spinning'), 500);
-    }
-
-    function enterArena() {
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('audioPanel').classList.add('visible');
-        
-        const bgm = document.getElementById('bgm');
-        bgm.volume = 0.4;
-        bgm.play().catch(e=>console.log("Audio block"));
-        
-        playSound();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
     }
 
     function renderTabs() {
@@ -226,14 +281,12 @@
 
     function renderList() {
         const q = document.getElementById('search').value.toLowerCase();
-        // Sort: Markah Tinggi -> Rendah. Kalau sama, Nama A->Z
         let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
         
-        // Podium
         const pod = document.getElementById('podium');
         pod.innerHTML = "";
         const top3 = list.slice(0,3);
-        const order = [1,0,2]; // Susunan Silver-Gold-Bronze
+        const order = [1,0,2]; 
         order.forEach(i => {
             if(top3[i]) {
                 const p = top3[i];
@@ -247,7 +300,6 @@
             }
         });
 
-        // List
         const cont = document.getElementById('list');
         cont.innerHTML = "";
         list.forEach((p, i) => {
@@ -299,21 +351,6 @@
         link.download = `ArabicMerit_${document.getElementById('m-name').innerText}.png`;
         link.href = canvas.toDataURL();
         link.click();
-    }
-
-    function playSound() { if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } }
-    function toggleMute() { 
-        const bgm = document.getElementById('bgm');
-        isMuted = !isMuted;
-        bgm.volume = isMuted ? 0 : lastVol;
-        document.getElementById('muteIcon').className = isMuted ? "fas fa-volume-mute" : "fas fa-volume-up";
-        document.getElementById('volSlider').value = bgm.volume;
-    }
-    function adjustVolume(v) {
-        document.getElementById('bgm').volume = v;
-        lastVol = v;
-        isMuted = false;
-        document.getElementById('muteIcon').className = "fas fa-volume-up";
     }
 </script>
 </body>
