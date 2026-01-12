@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN CONSOLE - Arabic Merit Pro V11.0 (Secure)</title>
+    <title>ADMIN CONSOLE - Arabic Merit Pro V13.3 (Cikgu Mode)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -14,44 +14,49 @@
     <style>
         :root {
             --primary: #4f46e5; --bg: #f1f5f9; --card: #ffffff;
-            --text: #0f172a; --success: #22c55e; --danger: #ef4444;
-            --warning: #f59e0b; --info: #0ea5e9; --dark: #1e293b;
+            --text: #0f172a; --success: #16a34a; --danger: #dc2626;
+            --warning: #ca8a04; --info: #0891b2; --dark: #1e293b;
+            --gold: #f59e0b; /* Warna Emas Baru */
         }
 
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .desktop-container { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
 
+        /* SIDEBAR */
         .sidebar { background: var(--card); padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); height: fit-content; position: sticky; top: 20px; }
         header { background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
         .sync-badge { font-size: 0.75rem; padding: 5px 12px; border-radius: 20px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.3); }
 
+        /* MAIN CONTENT */
         .main-content { background: var(--card); padding: 25px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .tabs-container { background: #f8fafc; padding: 10px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 8px; overflow-x: auto; border: 1px solid #e2e8f0; min-height: 50px; align-items: center; }
         .tab-btn { padding: 10px 20px; border-radius: 8px; border: 1px solid #cbd5e1; background: white; cursor: grab; white-space: nowrap; font-weight: 600; transition: 0.2s; }
         .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); cursor: pointer; }
 
+        /* CONTROLS */
         .admin-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .btn-action { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; transition: transform 0.1s; }
         .btn-action:active { transform: scale(0.98); }
 
         .search-bar { width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 20px; font-size: 1rem; box-sizing: border-box; }
 
+        /* TABLE */
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; border-bottom: 2px solid #e2e8f0; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; transition: background 0.3s; }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; transition: background 0.3s; vertical-align: middle; }
         tr:hover td { background: #f8fafc; }
 
-        /* MERIT BUTTONS STYLING */
-        .score-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; width: 100%; }
-        .btn-pts { padding: 8px 4px; border: none; border-radius: 5px; color: white; font-weight: bold; cursor: pointer; font-size: 0.7rem; transition: 0.2s; }
-        .btn-pts:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        /* SCORING BUTTONS */
+        .score-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+        .btn-pts { padding: 12px 2px; border: none; border-radius: 8px; color: white; font-weight: 800; cursor: pointer; font-size: 0.75rem; transition: 0.2s; letter-spacing: 0.5px; box-shadow: 0 2px 2px rgba(0,0,0,0.1); }
+        .btn-pts:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.15); }
         .btn-pts:active { transform: scale(0.95); }
         
-        .rank-tag { font-size: 0.65rem; padding: 3px 8px; border-radius: 4px; color: white; font-weight: bold; text-transform: uppercase; }
+        .rank-tag { font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; color: white; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 5px; }
 
+        /* MODALS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
         .modal { background: white; padding: 30px; border-radius: 15px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; animation: slideUp 0.3s ease-out; }
-        .modal h3 { margin-top: 0; }
         .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
@@ -59,10 +64,10 @@
         
         .sortable-ghost { opacity: 0.4; background: var(--info) !important; }
 
-        /* UPGRADED FEATURES CSS */
+        /* ANIMATIONS */
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        @keyframes popScore { 0% { transform: scale(1); } 50% { transform: scale(1.4); } 100% { transform: scale(1); } }
-        .pop-anim { animation: popScore 0.3s ease-in-out; }
+        @keyframes popScore { 0% { transform: scale(1); } 50% { transform: scale(1.5); color: var(--gold); } 100% { transform: scale(1); } }
+        .pop-anim { animation: popScore 0.4s ease-in-out; }
 
         /* TOAST NOTIFICATION */
         #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; }
@@ -78,20 +83,23 @@
 <div class="desktop-container">
     <div class="sidebar">
         <header>
-            <h2 style="margin:0"><i class="fas fa-graduation-cap"></i> MERIT ADMIN</h2>
-            <div id="syncStatus" class="sync-badge">Menghubungkan...</div>
+            <h2 style="margin:0; font-weight: 900; letter-spacing: 1px;"><i class="fas fa-gem"></i> MERIT ADMIN</h2>
+            <small style="opacity:0.9; font-size: 0.9rem;">SMK Mat Salleh Ranau</small>
+            <div id="syncStatus" class="sync-badge" style="margin-top:10px">Menghubungkan...</div>
         </header>
 
         <div class="stats-grid">
             <div class="stat-box" style="border-color:var(--success)">
-                <small>JUMLAH MERIT</small><div id="mSum" style="font-size:1.5rem; font-weight:800; color:var(--success)">0</div>
+                <small style="font-weight:bold; color:#64748b">JUMLAH MERIT</small>
+                <div id="mSum" style="font-size:1.6rem; font-weight:900; color:var(--success)">0</div>
             </div>
             <div class="stat-box" style="border-color:var(--danger)">
-                <small>JUMLAH DEMERIT</small><div id="dSum" style="font-size:1.5rem; font-weight:800; color:var(--danger)">0</div>
+                <small style="font-weight:bold; color:#64748b">JUMLAH PENALTI</small>
+                <div id="dSum" style="font-size:1.6rem; font-weight:900; color:var(--danger)">0</div>
             </div>
         </div>
 
-        <div style="height: 200px; margin-bottom: 20px;"><canvas id="sideChart"></canvas></div>
+        <div style="height: 220px; margin-bottom: 25px;"><canvas id="sideChart"></canvas></div>
 
         <div class="admin-controls" id="controlPanel" style="display:none">
             <button class="btn-action" style="background:var(--success)" onclick="openM('addM')"><i class="fas fa-user-plus"></i> Pelajar</button>
@@ -104,25 +112,25 @@
         </div>
 
         <div id="loginArea">
-            <div style="text-align:center; margin-bottom:15px; color:#64748b;"><i class="fas fa-lock fa-3x"></i></div>
-            <input type="password" id="passInput" placeholder="Katalaluan Admin" style="width:100%; padding:12px; border-radius:8px; border:1px solid #ddd; margin-bottom:10px" onkeypress="if(event.key==='Enter') checkLogin()">
-            <button class="btn-action" style="background:var(--primary); width:100%" onclick="checkLogin()">MASUK MOD ADMIN</button>
+            <div style="text-align:center; margin-bottom:20px; color:#64748b;"><i class="fas fa-lock fa-4x"></i></div>
+            <input type="password" id="passInput" placeholder="Katalaluan Admin" style="width:100%; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px; font-size:1rem;" onkeypress="if(event.key==='Enter') checkLogin()">
+            <button class="btn-action" style="background:var(--primary); width:100%; padding: 15px;" onclick="checkLogin()">MASUK MOD ADMIN</button>
         </div>
     </div>
 
     <div class="main-content">
         <div class="tabs-container" id="tabContainer"></div>
         
-        <input type="text" id="search" class="search-bar" placeholder="Cari nama pelajar dalam kelas ini..." onkeyup="refresh()">
+        <input type="text" id="search" class="search-bar" placeholder="🔍 Cari nama pelajar..." onkeyup="refresh()">
 
         <div style="overflow-x: auto;">
             <table id="dataTable">
                 <thead>
                     <tr>
-                        <th style="width: 40px">No</th>
-                        <th>Maklumat Pelajar</th>
-                        <th style="text-align:center; width: 60px">Skor</th>
-                        <th id="thAction" style="display:none">Kawalan Merit (Kiri) / Demerit (Kanan)</th>
+                        <th style="width: 50px; text-align:center;">#</th>
+                        <th>Leaderboard (Hall of Fame)</th>
+                        <th style="text-align:center; width: 100px">Points</th>
+                        <th id="thAction" style="display:none; width: 340px;">Panel Kawalan Guru</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -135,28 +143,28 @@
     <h3>Tambah Pelajar</h3>
     <input type="text" id="newName" placeholder="Nama Penuh Pelajar" onkeypress="if(event.key==='Enter') saveNew()">
     <button class="btn-action" style="background:var(--success); width:100%" onclick="saveNew()">Simpan Pelajar</button>
-    <button class="btn-action" style="background:#ccc; width:100%; margin-top:10px; color:black" onclick="closeM('addM')">Batal</button>
+    <button class="btn-action" style="background:#e2e8f0; width:100%; margin-top:10px; color:black" onclick="closeM('addM')">Batal</button>
 </div></div>
 
 <div id="addClassM" class="overlay"><div class="modal">
     <h3>Tambah Kelas Baru</h3>
     <input type="text" id="newClassName" placeholder="Contoh: 4 SETIA" onkeypress="if(event.key==='Enter') saveNewClass()">
     <button class="btn-action" style="background:var(--info); width:100%" onclick="saveNewClass()">Tambah Kelas</button>
-    <button class="btn-action" style="background:#ccc; width:100%; margin-top:10px; color:black" onclick="closeM('addClassM')">Batal</button>
+    <button class="btn-action" style="background:#e2e8f0; width:100%; margin-top:10px; color:black" onclick="closeM('addClassM')">Batal</button>
 </div></div>
 
 <div id="resetM" class="overlay"><div class="modal" style="border-top: 10px solid var(--danger);">
     <h3 style="color:var(--danger)">PENGESAHAN RESET</h3>
     <p>Kosongkan semua skor untuk kelas: <br><b id="resetClassName" style="font-size:1.2rem"></b>?</p>
     <button class="btn-action" style="background:var(--danger); width:100%" onclick="confirmReset()">Ya, Reset Skor</button>
-    <button class="btn-action" style="background:#ccc; width:100%; margin-top:10px; color:black" onclick="closeM('resetM')">Batal</button>
+    <button class="btn-action" style="background:#e2e8f0; width:100%; margin-top:10px; color:black" onclick="closeM('resetM')">Batal</button>
 </div></div>
 
 <script>
+    // CONFIGURATION
     const CLOUD_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
-    // PASSWORD: apipfathan@123 (Encoded Base64)
     const SECRET_KEY = "YXBpcGZhdGhhbkAxMjM="; 
-    const STORAGE_KEY = "ARABIC_DESKTOP_DB";
+    const STORAGE_KEY = "ARABIC_DESKTOP_DB_V13";
     
     let db = [];
     let classes = [];
@@ -191,7 +199,6 @@
         classes.forEach(c => { sortedDB = [...sortedDB, ...db.filter(s => s.c === c)]; });
         const rows = sortedDB.map(p => [p.n, p.s, p.c]);
         try {
-            // Hantar data secara BULK ke Google Script V2
             await fetch(CLOUD_URL + "?action=update", { method: "POST", mode: 'no-cors', body: JSON.stringify(rows) });
             status("● Cloud Synced", "color:var(--success)");
         } catch (e) { status("● Sync Error", "color:var(--danger)"); }
@@ -220,11 +227,12 @@
         });
     }
 
+    // --- STRATEGI RANKING BARU ---
     function getRank(s) {
-        if(s >= 100) return { l:"KHALIFAH", c:"#8b5cf6", i:"fa-crown" };
-        if(s >= 60) return { l:"ELITE", c:"#fbbf24", i:"fa-star" };
-        if(s >= 30) return { l:"PRO", c:"#3b82f6", i:"fa-user-shield" };
-        return { l:"NEWBIE", c:"#10b981", i:"fa-user" };
+        if(s >= 300) return { l:"KHALIFAH", c:"#7c3aed", i:"fa-crown" };      // 300+
+        if(s >= 150) return { l:"ELITE", c:"#f59e0b", i:"fa-medal" };         // 150 - 299
+        if(s >= 50) return { l:"PRO", c:"#0ea5e9", i:"fa-shield-alt" };       // 50 - 149
+        return { l:"NEWBIE", c:"#16a34a", i:"fa-seedling" };                  // 0 - 49
     }
 
     function refresh() {
@@ -237,29 +245,38 @@
             if(!p.n.includes(q)) return;
             const rank = getRank(p.s);
             const tr = document.createElement('tr');
+            
+            // Highlight Top 3
+            let rankDisplay = `<span style="color:#94a3b8">${idx+1}</span>`;
+            if(idx === 0) rankDisplay = '🥇';
+            if(idx === 1) rankDisplay = '🥈';
+            if(idx === 2) rankDisplay = '🥉';
+
             tr.innerHTML = `
-                <td style="color:#94a3b8; font-weight:bold">${idx+1}</td>
+                <td style="font-weight:bold; font-size:1.2rem; text-align:center">${rankDisplay}</td>
                 <td>
-                    <div style="font-weight:700">${p.n}</div>
+                    <div style="font-weight:700; font-size:1.05rem; margin-bottom:4px">${p.n}</div>
                     <span class="rank-tag" style="background:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</span>
                 </td>
                 <td style="text-align:center;">
-                    <div id="score-${idx}" style="font-size:1.3rem; font-weight:800; color:${p.s<0?'red':'var(--primary)'}">${p.s}</div>
+                    <div id="score-${idx}" style="font-size:1.8rem; font-weight:900; color:${p.s === 0 ? '#cbd5e1' : 'var(--primary)'}">${p.s}</div>
                 </td>
                 ${isAdmin ? `<td>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="score-btns">
-                            <button class="btn-pts" style="background:#065f46" onclick="mod('${p.n}', 5, ${idx})">Siap (+5)</button>
-                            <button class="btn-pts" style="background:#059669" onclick="mod('${p.n}', 3, ${idx})">Hafal (+3)</button>
-                            <button class="btn-pts" style="background:#0ea5e9" onclick="mod('${p.n}', 1, ${idx})">Ganjaran (+1)</button>
+                            <button class="btn-pts" style="background:#16a34a" onclick="mod('${p.n}', 5, ${idx})">HADIR (+5)</button>
+                            <button class="btn-pts" style="background:#2563eb" onclick="mod('${p.n}', 3, ${idx})">SIAP (+3)</button>
+                            <button class="btn-pts" style="background:#8b5cf6" onclick="mod('${p.n}', 2, ${idx})">MODUL (+2)</button>
                             
-                            <button class="btn-pts" style="background:#991b1b" onclick="mod('${p.n}', -5, ${idx})">T.Siap (-5)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -3, ${idx})">T.Hafal (-3)</button>
-                            <button class="btn-pts" style="background:#f43f5e" onclick="mod('${p.n}', -1, ${idx})">Tolak (-1)</button>
+                            <button class="btn-pts" style="background:var(--gold); color:white; border:1px solid #d97706" onclick="mod('${p.n}', 10, ${idx})">EARLY (+10)</button>
+                            <button class="btn-pts" style="background:#0891b2" onclick="mod('${p.n}', 5, ${idx})">KETUA (+5)</button>
+                            <button class="btn-pts" style="background:#be123c" onclick="mod('${p.n}', -2, ${idx})">LEWAT (-2)</button>
                             
-                            <button class="btn-pts" style="background:#1e293b; grid-column: span 3" onclick="mod('${p.n}', -12, ${idx})">PONTENG (-12)</button>
+                            <button class="btn-pts" style="background:#475569" onclick="mod('${p.n}', -1, ${idx})">BISING (-1)</button>
+                            <button class="btn-pts" style="background:#475569" onclick="mod('${p.n}', -3, ${idx})">T.SIAP (-3)</button>
+                            <button class="btn-pts" style="background:#0f172a" onclick="mod('${p.n}', -5, ${idx})">PONTENG (-5)</button>
                         </div>
-                        <button onclick="delStu('${p.n}')" style="border:none; background:none; color:var(--danger); cursor:pointer; font-size:1.1rem"><i class="fas fa-trash-alt"></i></button>
+                        <button onclick="delStu('${p.n}')" style="border:none; background:none; color:#cbd5e1; cursor:pointer; font-size:1rem; margin-left:5px"><i class="fas fa-trash"></i></button>
                     </div>
                 </td>` : ''}
             `;
@@ -273,9 +290,12 @@
         const p = db.find(x => x.n === n && x.c === activeCls);
         if(p) { 
             p.s += v; 
+            if(p.s < 0) p.s = 0; // ZERO FLOOR PROTECTION
             refresh(); 
             sync(); 
             showToast(`${n}: ${v>0?'+':''}${v}`, v>0 ? 'success':'danger');
+            
+            // Animation Trigger
             const el = document.getElementById(`score-${idx}`);
             if(el) {
                 el.classList.remove('pop-anim');
@@ -299,7 +319,7 @@
     }
 
     function delClass() {
-        if(confirm(`AWAS! Padam KELAS ${activeCls} dan SEMUA pelajar di dalamnya secara kekal?`)) {
+        if(confirm(`AWAS! Padam KELAS ${activeCls}?`)) {
             db = db.filter(x => x.c !== activeCls);
             activeCls = ""; updateClassList(); refresh(); sync();
         }
@@ -317,7 +337,7 @@
             type: 'doughnut',
             data: {
                 labels: data.map(x => x.n.split(' ')[0]),
-                datasets: [{ data: data.map(x => x.s), backgroundColor: ['#fbbf24','#94a3b8','#cd7f32','#4f46e5','#6366f1'], borderWeight: 0 }]
+                datasets: [{ data: data.map(x => x.s), backgroundColor: ['#ca8a04','#94a3b8','#cd7f32','#4f46e5','#6366f1'], borderWeight: 0 }]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } } } }
         });
@@ -341,8 +361,6 @@
             refresh();
         } else {
             showToast("Katalaluan Salah!", "danger");
-            document.getElementById('passInput').classList.add('pop-anim');
-            setTimeout(() => document.getElementById('passInput').classList.remove('pop-anim'), 300);
         }
     }
 
