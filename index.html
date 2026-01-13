@@ -67,9 +67,11 @@
             border: 1px solid rgba(255,255,255,0.1); border-radius: 15px 15px 5px 5px;
             padding-bottom: 10px; cursor: pointer; transition: 0.3s;
         }
+        /* CSS Podium */
         .r-1 { height: 100%; border-top: 4px solid var(--gold); order: 2; z-index: 2; box-shadow: 0 0 20px rgba(251,191,36,0.2); }
         .r-2 { height: 80%; border-top: 4px solid #94a3b8; order: 1; }
         .r-3 { height: 70%; border-top: 4px solid #b45309; order: 3; }
+        
         .p-score { font-family: 'Orbitron'; font-size: 1.4rem; font-weight: 800; margin-top: 5px; }
         .p-name { font-size: 0.8rem; font-weight: 700; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px; color:#cbd5e1;}
 
@@ -166,10 +168,9 @@
 
 <script>
     // ===========================================
-    // UPDATE SCRIPT (ANTI-KELIP & LINK BARU)
+    // UPDATE SCRIPT (FIXED PODIUM LOGIC)
     // ===========================================
     
-    // Link Script Terkini Tuan
     const API_URL = "https://script.google.com/macros/s/AKfycbwbI3aEh2q7IqIsQpZ7DFX2JuQFWbrFv3MASzCsMHHFmQTX8HXpR-oPK8L4FmSS_Wye/exec";
     
     const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
@@ -177,13 +178,11 @@
     let db = [], classes = [], activeCl = "";
     let isMuted = false, lastVol = 0.7;
     let audioCoin = new Audio(COIN_SFX);
-    
-    // Variable untuk Anti-Kelip
     let lastDataFingerprint = ""; 
 
     function init() {
         fetchData(); 
-        setInterval(() => { fetchData(true); }, 5000); // Semak setiap 5 saat
+        setInterval(() => { fetchData(true); }, 5000); 
     }
 
     async function fetchData(isSilent = false) {
@@ -191,27 +190,30 @@
             const res = await fetch(API_URL);
             const data = await res.json();
             
-            // --- LOGIK ANTI-KELIP ---
+            // ANTI-KELIP
             const newFingerprint = JSON.stringify(data);
             if (newFingerprint === lastDataFingerprint) {
-                // Jika data sama, jangan buat apa-apa (elak refresh/kelip)
                 if(!isSilent) console.log("Data up-to-date.");
                 return;
             }
             lastDataFingerprint = newFingerprint;
-            // -------------------------
 
-            // Map data (Support format lama [0] atau format baru .n)
+            // Map Data
             db = data.map(x => ({ 
                 n: String(x.n || x[0]), 
                 s: parseInt(x.s || x[1]) || 0, 
                 c: String(x.c || x[2]) 
             }));
             
-            const prevClass = activeCl;
-            classes = [...new Set(db.map(x => x.c))].sort();
+            // Auto Update Class List (Tahan Lasak)
+            const newClasses = [...new Set(db.map(x => x.c))].sort();
             
-            // Jika kelas aktif tiada dalam senarai baru (atau kosong), reset ke kelas pertama
+            // Jika ada kelas baru atau berbeza, update senarai
+            if(JSON.stringify(newClasses) !== JSON.stringify(classes)) {
+                classes = newClasses;
+            }
+            
+            // Jika kelas aktif hilang/kosong, reset ke 1st class
             if(!activeCl || !classes.includes(activeCl)) {
                 if(classes.length > 0) activeCl = classes[0];
             }
@@ -223,7 +225,7 @@
 
     async function manualRefresh(btn) {
         btn.classList.add('spinning');
-        lastDataFingerprint = ""; // Force update
+        lastDataFingerprint = ""; 
         if(navigator.vibrate) navigator.vibrate(30);
         await fetchData();
         setTimeout(() => btn.classList.remove('spinning'), 500);
@@ -265,8 +267,6 @@
         const newHTML = classes.map(c => 
             `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
         ).join('');
-        
-        // Render hanya jika berubah
         if(tabsContainer.innerHTML !== newHTML) tabsContainer.innerHTML = newHTML;
     }
 
@@ -277,24 +277,44 @@
         let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
         
         const pod = document.getElementById('podium'); 
-        const top3 = list.slice(0,3); const order = [1,0,2]; 
+        const top3 = list.slice(0,3); 
+        
+        // SUSUNAN VISUAL: [KIRI (2ND), TENGAH (1ST), KANAN (3RD)]
+        // Tapi kita kena ambil data berdasarkan RANKING SEBENAR dari array top3
+        // top3[0] = JUARA, top3[1] = NAIB JUARA, top3[2] = KETIGA
+        
+        const order = [1, 0, 2]; 
         let podHTML = "";
 
         order.forEach(i => {
             if(top3[i]) {
-                const p = top3[i]; const rank = i+1; const icons = ['👑','🥈','🥉'];
-                // Paksa ranking sebenar: index 1(Left)=2nd, index 0(Center)=1st, index 2(Right)=3rd
-                let rClass = 1;
-                if(i===0) rClass = 2; // Kiri (2nd)
-                if(i===1) rClass = 1; // Tengah (1st)
-                if(i===2) rClass = 3; // Kanan (3rd)
+                const p = top3[i]; 
+                
+                // LOGIK BARU (FIXED):
+                // 'i' adalah index dari ranking sebenar.
+                // i=0 ialah Juara (Rank 1), i=1 ialah Naib Juara (Rank 2), i=2 ialah Ketiga (Rank 3)
+                
+                let visualClass = "";
+                let icon = "";
+                
+                if (i === 0) { // JUARA (Rank 1)
+                    visualClass = "r-1"; // Paling Tinggi
+                    icon = "👑"; // Crown
+                } else if (i === 1) { // NAIB JUARA (Rank 2)
+                    visualClass = "r-2"; // Sederhana
+                    icon = "🥈"; // Silver
+                } else { // KETIGA (Rank 3)
+                    visualClass = "r-3"; // Rendah
+                    icon = "🥉"; // Bronze
+                }
 
-                podHTML += `<div class="podium-card r-${rClass}" onclick="showCard('${p.n}',${p.s})">
-                    <div style="font-size:2rem; margin-bottom:5px;">${i===1 ? '👑' : (i===0 ? '🥈' : '🥉')}</div>
+                podHTML += `<div class="podium-card ${visualClass}" onclick="showCard('${p.n}',${p.s})">
+                    <div style="font-size:2rem; margin-bottom:5px;">${icon}</div>
                     <div class="p-score">${p.s}</div>
                     <div class="p-name">${p.n.split(" ")[0]}</div>
                 </div>`;
             } else {
+                 // Kotak halimunan supaya layout tak lari kalau pelajar kurang dari 3
                  podHTML += `<div class="podium-card" style="opacity:0; pointer-events:none;"></div>`;
             }
         });
@@ -350,4 +370,3 @@
 </script>
 </body>
 </html>
- 
