@@ -2,303 +2,339 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hall of Fame - Arabic Merit</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARABIC HALL OF FAME</title>
     
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="apple-touch-icon" href="logo.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
     <style>
-        :root {
-            --bg-dark: #0f172a;
-            --glass: rgba(30, 41, 59, 0.7);
-            --gold: #fbbf24; --gold-glow: rgba(251, 191, 36, 0.4);
-            --neon: #8b5cf6;
-            --text-main: #f8fafc;
-        }
-
-        body {
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(at 50% 0%, #1e1b4b 0%, #020617 80%);
-            color: var(--text-main); font-family: 'Rajdhani', sans-serif;
-            margin: 0; padding-bottom: 80px; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
-        }
-
-        /* --- UI COMPONENTS --- */
-        .audio-panel {
-            position: fixed; top: 15px; right: 15px; z-index: 999;
-            background: rgba(15,23,42,0.8); backdrop-filter: blur(10px);
-            padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 12px;
-            border: 1px solid rgba(255,255,255,0.1); transform: translateY(-100px); transition: 0.3s;
-        }
-        .audio-panel.visible { transform: translateY(0); }
-        .vol-slider { width: 70px; height: 4px; accent-color: var(--gold); cursor: pointer; }
-
-        /* Start Screen */
-        #start-screen {
-            position: fixed; inset: 0; z-index: 10000; background: #020617;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-        }
-        .btn-enter {
-            background: linear-gradient(135deg, #fbbf24, #d97706);
-            color: #000; border: none; padding: 18px 50px;
-            font-size: 1.4rem; font-family: 'Orbitron'; font-weight: 900;
-            border-radius: 50px; cursor: pointer; margin-top: 30px;
-            box-shadow: 0 0 30px var(--gold-glow); animation: pulse 2s infinite;
-        }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
-
-        /* Header & Podium */
-        header { text-align: center; padding: 40px 20px 20px; }
-        h1 { font-family: 'Orbitron'; font-size: 2.2rem; margin: 0; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        :root { --gold: #fbbf24; --dark: #0f172a; --card: #1e293b; --text: #f8fafc; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
+        body {
+            background-color: var(--dark); color: var(--text);
+            font-family: 'Poppins', sans-serif; margin: 0; padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* --- START SCREEN --- */
+        #start-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center;
+        }
+        .start-btn {
+            background: var(--gold); color: black; border: none; padding: 15px 40px;
+            font-size: 1.5rem; font-family: 'Orbitron'; font-weight: bold;
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
+            cursor: pointer; animation: pulse 1.5s infinite; margin-top: 20px;
+        }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 20px var(--gold); } 100% { transform: scale(1); } }
+
+        /* --- AUDIO PANEL --- */
+        #audioPanel {
+            position: fixed; bottom: 20px; right: 20px; z-index: 100;
+            background: rgba(0,0,0,0.6); padding: 10px; border-radius: 30px;
+            display: flex; gap: 10px; align-items: center; border: 1px solid var(--gold);
+            opacity: 0; transition: 1s; visibility: hidden;
+        }
+        #audioPanel.visible { opacity: 1; visibility: visible; }
+        .audio-btn { background: none; border: none; color: var(--gold); font-size: 1.2rem; cursor: pointer; }
+
+        /* --- MAIN LAYOUT --- */
+        .header { text-align: center; padding: 20px; background: linear-gradient(to bottom, #1e293b, #0f172a); border-bottom: 2px solid var(--gold); }
+        .logo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; background: #000; }
+        h1 { font-family: 'Orbitron'; color: var(--gold); margin: 10px 0 0; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); letter-spacing: 2px; }
+
+        /* --- CONTROLS --- */
+        .controls { padding: 15px; display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin: 0 auto; }
+        #search { padding: 12px; border-radius: 8px; border: 1px solid #475569; background: #334155; color: white; text-align: center; font-family: 'Orbitron'; }
+        
+        /* TABS KELAS */
+        .tabs { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; justify-content: center; }
+        .tab-btn {
+            background: #334155; color: #94a3b8; border: none; padding: 8px 15px;
+            border-radius: 5px; font-weight: bold; cursor: pointer; white-space: nowrap;
+        }
+        .tab-btn.active { background: var(--gold); color: black; box-shadow: 0 0 10px var(--gold); }
+
+        /* --- PODIUM (TOP 3) --- */
         .podium-container {
-            display: flex; justify-content: center; align-items: flex-end;
-            height: 260px; gap: 10px; margin: 20px auto 30px; max-width: 600px; padding: 0 15px;
+            display: flex; justify-content: center; align-items: flex-end; gap: 10px;
+            margin: 20px auto; max-width: 500px; height: 220px;
         }
         .podium-card {
-            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            background: var(--glass); backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px 15px 5px 5px;
-            padding-bottom: 10px; cursor: pointer; transition: 0.3s;
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 10px 10px 0 0;
+            text-align: center; padding: 10px; width: 30%; position: relative; cursor: pointer;
+            transition: 0.3s; display: flex; flex-direction: column; justify-content: flex-end;
         }
-        .r-1 { height: 100%; border-top: 4px solid var(--gold); order: 2; z-index: 2; box-shadow: 0 0 20px rgba(251,191,36,0.2); }
-        .r-2 { height: 80%; border-top: 4px solid #94a3b8; order: 1; }
-        .r-3 { height: 70%; border-top: 4px solid #b45309; order: 3; }
-        .p-score { font-family: 'Orbitron'; font-size: 1.4rem; font-weight: 800; margin-top: 5px; }
-        .p-name { font-size: 0.8rem; font-weight: 700; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px; color:#cbd5e1;}
+        .podium-card:active { transform: scale(0.95); }
+        .r-1 { height: 100%; border-bottom: 5px solid #fbbf24; z-index: 2; box-shadow: 0 0 20px rgba(251, 191, 36, 0.2); }
+        .r-2 { height: 85%; border-bottom: 5px solid #94a3b8; }
+        .r-3 { height: 70%; border-bottom: 5px solid #b45309; }
+        .p-score { font-family: 'Orbitron'; font-size: 1.5rem; font-weight: bold; color: white; margin: 5px 0; }
+        .p-name { font-size: 0.8rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-        /* List & Tabs */
-        .controls { max-width: 650px; margin: 0 auto; padding: 0 15px; }
-        .tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
-        .tab-btn { background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); padding: 8px 18px; border-radius: 20px; white-space: nowrap; cursor: pointer; }
-        .tab-btn.active { background: var(--neon); color: white; border-color: var(--neon); box-shadow: 0 0 15px rgba(139,92,246,0.4); }
-        
-        .search-box { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; margin-bottom: 15px; font-family: 'Rajdhani'; }
-
-        .list-container { max-width: 650px; margin: 0 auto; padding: 0 15px; }
+        /* --- LIST SENARAI --- */
+        .list-container { max-width: 600px; margin: 0 auto; padding: 0 15px 80px; }
         .student-row {
-            background: var(--glass); margin-bottom: 8px; padding: 12px 18px; border-radius: 12px;
-            display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.03);
-            animation: fadeIn 0.5s ease;
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--card); margin-bottom: 8px; padding: 15px;
+            border-radius: 8px; border: 1px solid #334155; cursor: pointer;
+            transition: 0.2s;
         }
-        @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
-        .s-score { font-family: 'Orbitron'; font-weight: 900; font-size: 1.2rem; color: var(--gold); }
+        .student-row:hover { transform: translateX(5px); border-color: var(--gold); }
+        .s-score { font-family: 'Orbitron'; font-size: 1.2rem; font-weight: bold; }
 
-        /* Refresh Button */
-        .refresh-btn {
-            position: fixed; bottom: 20px; right: 20px; z-index: 999;
-            background: var(--gold); color: #000; width: 50px; height: 50px; border-radius: 50%;
-            border: none; box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); font-size: 1.2rem;
-            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;
+        /* --- MODAL CARD --- */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 9999;
+            align-items: center; justify-content: center;
         }
-        .refresh-btn:active { transform: scale(0.9); }
-        .refresh-btn.spinning i { animation: spinIcon 1s linear infinite; }
-        @keyframes spinIcon { 100% { transform: rotate(360deg); } }
-
-        /* Modal */
-        #card-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .player-card { background: linear-gradient(135deg, #1e1b4b, #0f172a); width: 85%; max-width: 320px; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); text-align: center; position: relative; }
-        .pc-score { font-size: 4rem; font-family: 'Orbitron'; color: var(--gold); margin: 10px 0; font-weight: 900; text-shadow: 0 0 20px var(--gold); }
+        .card-box {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            width: 320px; padding: 20px; border-radius: 20px;
+            border: 2px solid var(--gold); text-align: center; position: relative;
+            box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);
+        }
+        .close-btn { position: absolute; top: 10px; right: 15px; color: #fff; font-size: 1.5rem; cursor: pointer; }
+        .rank-badge { 
+            background: rgba(255,255,255,0.1); display: inline-block; padding: 5px 15px; 
+            border-radius: 20px; margin-bottom: 15px; font-family: 'Orbitron'; letter-spacing: 2px;
+        }
         
-        /* Logo dalam Card */
-        .card-logo { width: 60px; height: 60px; object-fit: contain; margin-bottom: 10px; }
+        /* Loading Spinner Button */
+        .spinning { animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
     </style>
 </head>
 <body onload="init()">
 
-<div class="audio-panel" id="audioPanel">
-    <i class="fas fa-volume-up" id="muteIcon" onclick="toggleMute()"></i>
-    <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.1" value="0.7" oninput="adjustVolume(this.value)">
-</div>
+    <audio id="bgm" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
 
-<div id="start-screen">
-    <img src="logo.png" style="width:100px; height:100px; margin-bottom:20px; border-radius:50%; box-shadow: 0 0 30px rgba(251, 191, 36, 0.3);" onerror="this.style.display='none'; document.getElementById('backup-icon').style.display='block'">
-    <div id="backup-icon" style="display:none; font-size:3rem; color:var(--gold); margin-bottom:20px;"><i class="fas fa-crown"></i></div>
-    
-    <h1 style="font-size:1.5rem; color:#94a3b8; letter-spacing:2px; margin:0;">ARABIC MERIT</h1>
-    <h2 style="font-size:2.5rem; margin:5px 0; font-family:'Orbitron'">HALL OF FAME</h2>
-    <div style="margin-bottom:10px; color:#64748b; font-size:0.8rem;">Tap untuk mulakan</div>
-    <button class="btn-enter" onclick="enterArena()">MASUK ARENA</button>
-</div>
-
-<audio id="bgm" preload="auto" loop>
-    <source src="music.mp3" type="audio/mpeg" onerror="console.log('Music not found')">
-</audio>
-
-<header>
-    <img src="logo.png" style="width:50px; margin-bottom:10px; border-radius:50%;" onerror="this.style.display='none'">
-    <h1>HALL OF FAME</h1>
-    <div style="color:var(--neon); letter-spacing:3px; font-weight:bold; font-size:0.8rem; margin-top:5px;">PEJUANG BAHASA ARAB</div>
-</header>
-
-<div class="controls">
-    <div class="tabs" id="tabs"></div>
-</div>
-
-<div class="podium-container" id="podium"></div>
-
-<div class="controls">
-    <input type="text" class="search-box" id="search" placeholder="Cari nama..." onkeyup="renderList()">
-</div>
-<div class="list-container" id="list"></div>
-
-<button class="refresh-btn" onclick="manualRefresh(this)"><i class="fas fa-sync-alt"></i></button>
-
-<div id="card-modal" onclick="closeCard()">
-    <div class="player-card" id="capture-area" onclick="event.stopPropagation()">
-        <img src="logo.png" class="card-logo" onerror="this.style.display='none'">
-        
-        <div id="m-rank-badge" style="color:var(--gold); font-family:'Orbitron'; letter-spacing:2px; margin-bottom:10px;">KHALIFAH</div>
-        <i id="m-rank-icon" class="fas fa-crown" style="font-size: 3rem; color:white; margin:10px 0;"></i>
-        <div id="m-name" style="font-size: 1.3rem; font-weight: 800; color:white; margin-top:10px;">NAMA</div>
-        <div class="pc-score" id="m-score">0</div>
-        <div id="m-desc" style="color:#94a3b8; font-style:italic; margin-bottom:25px;">"Usaha tangga kejayaan!"</div>
-        <button onclick="shareCard()" style="background:var(--neon); color:white; border:none; padding:12px; border-radius:15px; width:100%; font-weight:bold; cursor:pointer;">SHARE KAD</button>
-        <div style="margin-top:10px; font-size:0.8rem; color:#64748b; cursor:pointer;" onclick="closeCard()">Tutup</div>
+    <div id="start-screen">
+        <img src="logo.png" class="logo" style="width:150px; height:150px; margin-bottom:20px;">
+        <h1 style="font-size: 2rem; margin-bottom: 5px;">HALL OF FAME</h1>
+        <p style="color: #94a3b8;">ARABIC MERIT SYSTEM</p>
+        <button class="start-btn" onclick="enterArena()">ENTER ARENA</button>
     </div>
-</div>
 
-<script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
-    const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
+    <div id="audioPanel">
+        <button class="audio-btn" onclick="toggleMute()"><i id="muteIcon" class="fas fa-volume-up"></i></button>
+        <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.7" style="width: 80px;" oninput="adjustVolume(this.value)">
+        <button class="audio-btn" onclick="manualRefresh(this)"><i class="fas fa-sync-alt"></i></button>
+    </div>
 
-    let db = [], classes = [], activeCl = "";
-    let isMuted = false, lastVol = 0.7;
-    let audioCoin = new Audio(COIN_SFX);
+    <div class="header">
+        <img src="logo.png" class="logo">
+        <h1>HALL OF FAME</h1>
+        <div style="color: #fbbf24; font-size: 0.9rem; letter-spacing: 3px;">ARABIC MERIT</div>
+    </div>
 
-    function init() {
-        fetchData(); 
-        setInterval(() => { console.log("Auto-updating..."); fetchData(true); }, 10000); 
-    }
+    <div class="controls">
+        <input type="text" id="search" placeholder="🔍 Cari Nama Pelajar..." onkeyup="renderList()">
+        <div class="tabs" id="tabs">
+            </div>
+    </div>
 
-    async function fetchData(isSilent = false) {
-        try {
-            const res = await fetch(API_URL);
-            const data = await res.json();
-            db = data.map(x => ({ n: String(x[0]), s: parseInt(x[1]) || 0, c: String(x[2]) }));
+    <div class="podium-container" id="podium">
+        </div>
+
+    <div class="list-container" id="list">
+        </div>
+
+    <div id="card-modal" class="modal" onclick="if(event.target==this) closeCard()">
+        <div class="card-box" id="capture-area">
+            <div class="close-btn" onclick="closeCard()">&times;</div>
+            <img src="logo.png" style="width:60px; height:60px; border-radius:50%; border:2px solid var(--gold); margin-bottom:10px;">
+            <h2 style="margin:0; font-size:1.5rem;" id="m-name">NAMA PELAJAR</h2>
+            <div id="m-desc" style="color:#94a3b8; font-style:italic; font-size:0.9rem; margin-bottom:15px;">"Usaha tangga kejayaan!"</div>
             
-            const prevClass = activeCl;
-            classes = [...new Set(db.map(x => x.c))];
-            if(!activeCl && classes.length > 0) activeCl = classes[0];
+            <div class="rank-badge" id="m-rank-badge">RANK</div>
+            
+            <div style="background:rgba(0,0,0,0.5); padding:15px; border-radius:10px; margin-bottom:20px;">
+                <i id="m-rank-icon" class="fas fa-star" style="font-size:2rem; margin-bottom:5px;"></i>
+                <div style="font-size:3rem; font-family:'Orbitron'; color:white; line-height:1;" id="m-score">0</div>
+                <div style="color:#94a3b8; font-size:0.8rem;">TOTAL MERIT</div>
+            </div>
 
-            renderTabs();
-            renderList();
-        } catch (e) { console.error("Connection error"); }
-    }
+            <button onclick="shareCard()" style="background:var(--gold); border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">
+                <i class="fas fa-share-alt"></i> SAVE CARD
+            </button>
+        </div>
+    </div>
 
-    async function manualRefresh(btn) {
-        btn.classList.add('spinning');
-        if(navigator.vibrate) navigator.vibrate(30);
-        await fetchData();
-        setTimeout(() => btn.classList.remove('spinning'), 500);
-    }
-
-    function enterArena() {
-        document.getElementById('start-screen').style.display = 'none';
-        document.getElementById('audioPanel').classList.add('visible');
+    <script>
+        // --- CONFIGURATION ---
+        // PASTE URL SCRIPT GOOGLE APPS SCRIPT ANDA DI SINI
+        const API_URL = "https://script.google.com/macros/s/AKfycbw8gWAH5xpdKATiCC33VL3GcIUnRMGqms0NYsSXDVLZQxOGTMNKRWyG7d5xxGf-T0-X/exec";
         
-        const bgm = document.getElementById('bgm');
-        bgm.volume = lastVol;
-        
-        var playPromise = bgm.play();
-        if (playPromise !== undefined) {
-            playPromise.then(_ => { console.log("Audio playing (music.mp3)."); })
-            .catch(error => { console.log("Audio Error: " + error); alert("Muzik wujud tapi diblock oleh phone.\n\nSila pastikan 'Silent Mode' dimatikan."); });
+        const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
+
+        let db = [], classes = [], activeCl = "";
+        let isMuted = false, lastVol = 0.7;
+        let audioCoin = new Audio(COIN_SFX);
+        let lastDataFingerprint = ""; // VARIABLE PENTING (ANTI KELIP)
+
+        function init() {
+            fetchData(); 
+            setInterval(() => { fetchData(true); }, 5000); // Check setiap 5 saat
         }
-        
-        playSound();
-        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-    }
 
-    function toggleMute() { 
-        const bgm = document.getElementById('bgm'); isMuted = !isMuted;
-        if(isMuted) { bgm.pause(); document.getElementById('muteIcon').className = "fas fa-volume-mute"; document.getElementById('volSlider').value = 0; } 
-        else { bgm.play(); bgm.volume = lastVol; document.getElementById('muteIcon').className = "fas fa-volume-up"; document.getElementById('volSlider').value = lastVol; }
-    }
+        async function fetchData(isSilent = false) {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                
+                // --- TEKNIK ANTI KELIP ---
+                const newFingerprint = JSON.stringify(data);
+                if (newFingerprint === lastDataFingerprint) {
+                    if(!isSilent) console.log("Data sama, tiada refresh.");
+                    return; // STOP DI SINI KALAU DATA SAMA
+                }
+                
+                console.log("Data baru! Updating...");
+                lastDataFingerprint = newFingerprint;
+                
+                db = data.map(x => ({ n: String(x.n), s: parseInt(x.s) || 0, c: String(x.c) }));
+                
+                // Set Kelas
+                const prevClass = activeCl;
+                classes = [...new Set(db.map(x => x.c))].sort();
+                if(!activeCl && classes.length > 0) activeCl = classes[0];
 
-    function adjustVolume(v) {
-        const bgm = document.getElementById('bgm'); bgm.volume = v; lastVol = v;
-        if(v > 0 && isMuted) { isMuted = false; bgm.play(); document.getElementById('muteIcon').className = "fas fa-volume-up"; } 
-        else if (v == 0) { isMuted = true; document.getElementById('muteIcon').className = "fas fa-volume-mute"; }
-    }
+                renderTabs();
+                renderList(); // Auto refresh paparan
 
-    function playSound() { if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } }
+            } catch (e) { console.error("Error:", e); }
+        }
 
-    function renderTabs() {
-        document.getElementById('tabs').innerHTML = classes.map(c => 
-            `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
-        ).join('');
-    }
+        async function manualRefresh(btn) {
+            btn.classList.add('spinning');
+            lastDataFingerprint = ""; // Force refresh
+            if(navigator.vibrate) navigator.vibrate(30);
+            await fetchData();
+            setTimeout(() => btn.classList.remove('spinning'), 500);
+        }
 
-    function setCl(c) { activeCl = c; playSound(); renderTabs(); renderList(); }
+        function enterArena() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('audioPanel').classList.add('visible');
+            const bgm = document.getElementById('bgm');
+            bgm.volume = lastVol;
+            bgm.play().catch(e => console.log("Audio play blocked"));
+            playSound();
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+        }
 
-    function renderList() {
-        const q = document.getElementById('search').value.toLowerCase();
-        let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
-        
-        const pod = document.getElementById('podium'); pod.innerHTML = "";
-        const top3 = list.slice(0,3); const order = [1,0,2]; 
-        order.forEach(i => {
-            if(top3[i]) {
-                const p = top3[i]; const rank = i+1; const icons = ['👑','🥈','🥉'];
-                pod.innerHTML += `<div class="podium-card r-${rank}" onclick="showCard('${p.n}',${p.s})">
-                    <div style="font-size:2rem; margin-bottom:5px;">${icons[i]}</div>
-                    <div class="p-score">${p.s}</div>
-                    <div class="p-name">${p.n.split(" ")[0]}</div>
+        function toggleMute() { 
+            const bgm = document.getElementById('bgm'); isMuted = !isMuted;
+            if(isMuted) { bgm.pause(); document.getElementById('muteIcon').className = "fas fa-volume-mute"; document.getElementById('volSlider').value = 0; } 
+            else { bgm.play(); bgm.volume = lastVol; document.getElementById('muteIcon').className = "fas fa-volume-up"; document.getElementById('volSlider').value = lastVol; }
+        }
+
+        function adjustVolume(v) {
+            const bgm = document.getElementById('bgm'); bgm.volume = v; lastVol = v;
+            if(v > 0 && isMuted) { isMuted = false; bgm.play(); document.getElementById('muteIcon').className = "fas fa-volume-up"; }
+        }
+
+        function playSound() { if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabs');
+            const newHTML = classes.map(c => 
+                `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
+            ).join('');
+            
+            if(tabsContainer.innerHTML !== newHTML) tabsContainer.innerHTML = newHTML;
+        }
+
+        function setCl(c) { 
+            activeCl = c; 
+            playSound(); 
+            renderTabs(); 
+            renderList(); 
+        }
+
+        function renderList() {
+            const q = document.getElementById('search').value.toLowerCase();
+            let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
+            
+            // Render Podium
+            const pod = document.getElementById('podium'); 
+            const top3 = list.slice(0,3); const order = [1,0,2]; 
+            let podHTML = "";
+            order.forEach(i => {
+                if(top3[i]) {
+                    const p = top3[i]; const rank = i+1; const icons = ['👑','🥈','🥉'];
+                    podHTML += `<div class="podium-card r-${rank}" onclick="showCard('${p.n}',${p.s})">
+                        <div style="font-size:2rem; margin-bottom:5px;">${icons[i]}</div>
+                        <div class="p-score">${p.s}</div>
+                        <div class="p-name">${p.n.split(" ")[0]}</div>
+                    </div>`;
+                }
+            });
+            if(pod.innerHTML !== podHTML) pod.innerHTML = podHTML;
+
+            // Render List
+            const cont = document.getElementById('list'); 
+            let listHTML = "";
+            list.forEach((p, i) => {
+                if(q && !p.n.toLowerCase().includes(q)) return;
+                const rank = getRank(p.s); const isTop3 = i < 3;
+                listHTML += `<div class="student-row" style="${isTop3?'border-left:3px solid '+rank.c:''}" onclick="showCard('${p.n}',${p.s})">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="color:#64748b; font-family:'Orbitron'; width:25px;">#${i+1}</span>
+                        <div><div style="font-weight:700;">${p.n}</div><div style="font-size:0.7rem; color:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</div></div>
+                    </div><div class="s-score" style="color:${rank.c}">${p.s}</div>
                 </div>`;
-            }
-        });
+            });
+            cont.innerHTML = listHTML;
+        }
 
-        const cont = document.getElementById('list'); cont.innerHTML = "";
-        list.forEach((p, i) => {
-            if(q && !p.n.toLowerCase().includes(q)) return;
-            const rank = getRank(p.s); const isTop3 = i < 3;
-            cont.innerHTML += `<div class="student-row" style="${isTop3?'border-left:3px solid '+rank.c:''}" onclick="showCard('${p.n}',${p.s})">
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <span style="color:#64748b; font-family:'Orbitron'; width:25px;">#${i+1}</span>
-                    <div><div style="font-weight:700;">${p.n}</div><div style="font-size:0.7rem; color:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</div></div>
-                </div><div class="s-score" style="color:${rank.c}">${p.s}</div>
-            </div>`;
-        });
-    }
+        function getRank(s) {
+            if(s >= 300) return { l:"KHALIFAH", c:"#7c3aed", i:"fa-crown" };
+            if(s >= 150) return { l:"ELITE", c:"#f59e0b", i:"fa-medal" };
+            if(s >= 50) return { l:"PRO", c:"#3b82f6", i:"fa-shield-alt" };
+            return { l:"NEWBIE", c:"#22c55e", i:"fa-seedling" };
+        }
 
-    function getRank(s) {
-        if(s >= 300) return { l:"KHALIFAH", c:"#7c3aed", i:"fa-crown" };
-        if(s >= 150) return { l:"ELITE", c:"#f59e0b", i:"fa-medal" };
-        if(s >= 50) return { l:"PRO", c:"#3b82f6", i:"fa-shield-alt" };
-        return { l:"NEWBIE", c:"#22c55e", i:"fa-seedling" };
-    }
+        function showCard(n, s) {
+            const r = getRank(s);
+            document.getElementById('card-modal').style.display = 'flex';
+            document.getElementById('m-name').innerText = n; 
+            document.getElementById('m-score').innerText = s;
+            document.getElementById('m-score').style.color = r.c; 
+            document.getElementById('m-rank-badge').innerText = r.l;
+            document.getElementById('m-rank-badge').style.color = r.c; 
+            document.getElementById('m-rank-icon').className = `fas ${r.i}`; 
+            document.getElementById('m-rank-icon').style.color = r.c;
+            playSound();
+        }
 
-    function showCard(n, s) {
-        const r = getRank(s);
-        document.getElementById('card-modal').style.display = 'flex';
-        document.getElementById('m-name').innerText = n; document.getElementById('m-score').innerText = s;
-        document.getElementById('m-score').style.color = r.c; document.getElementById('m-rank-badge').innerText = r.l;
-        document.getElementById('m-rank-badge').style.color = r.c; document.getElementById('m-rank-icon').className = `fas ${r.i}`; document.getElementById('m-rank-icon').style.color = r.c;
+        function closeCard() { document.getElementById('card-modal').style.display='none'; }
         
-        if(s>=300) document.getElementById('m-desc').innerText = '"Lagenda Bahasa Arab!"';
-        else if(s>=150) document.getElementById('m-desc').innerText = '"Pejuang Sejati!"';
-        else if(s>=50) document.getElementById('m-desc').innerText = '"Semangat Membara!"';
-        else document.getElementById('m-desc').innerText = '"Mula Langkah Pertama!"';
-        playSound();
-    }
-
-    function closeCard() { document.getElementById('card-modal').style.display='none'; }
-    
-    async function shareCard() {
-        const area = document.getElementById('capture-area');
-        const canvas = await html2canvas(area, { backgroundColor: '#0f172a', scale: 2 });
-        const link = document.createElement('a');
-        link.download = `ArabicMerit_${document.getElementById('m-name').innerText}.png`;
-        link.href = canvas.toDataURL();
-        link.click();
-    }
-</script>
+        async function shareCard() {
+            const area = document.getElementById('capture-area');
+            const canvas = await html2canvas(area, { backgroundColor: '#0f172a', scale: 2 });
+            const link = document.createElement('a');
+            link.download = `ArabicMerit_${document.getElementById('m-name').innerText}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+    </script>
 </body>
 </html>
