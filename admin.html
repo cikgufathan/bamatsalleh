@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN CONSOLE - Arabic Merit Pro</title>
+    <title>ADMIN CONSOLE - Arabic Merit Pro V13.3 (Cikgu Mode)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -16,10 +16,10 @@
             --primary: #4f46e5; --bg: #f1f5f9; --card: #ffffff;
             --text: #0f172a; --success: #16a34a; --danger: #dc2626;
             --warning: #ca8a04; --info: #0891b2; --dark: #1e293b;
-            --gold: #f59e0b;
+            --gold: #f59e0b; /* Warna Emas Baru */
         }
 
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .desktop-container { max-width: 1300px; margin: 0 auto; display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
 
         /* SIDEBAR */
@@ -37,6 +37,7 @@
         .admin-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         .btn-action { padding: 12px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.85rem; transition: transform 0.1s; }
         .btn-action:active { transform: scale(0.98); }
+
         .search-bar { width: 100%; padding: 15px; border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 20px; font-size: 1rem; box-sizing: border-box; }
 
         /* TABLE */
@@ -45,25 +46,34 @@
         td { padding: 15px; border-bottom: 1px solid #f1f5f9; transition: background 0.3s; vertical-align: middle; }
         tr:hover td { background: #f8fafc; }
 
-        /* SCORING BUTTONS (LAYOUT BARU) */
-        .score-btns { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; width: 100%; }
-        .btn-pts { padding: 10px 2px; border: none; border-radius: 6px; color: white; font-weight: 700; cursor: pointer; font-size: 0.75rem; transition: 0.2s; letter-spacing: 0.5px; box-shadow: 0 2px 2px rgba(0,0,0,0.1); }
-        .btn-pts:hover { opacity: 0.9; transform: translateY(-1px); }
+        /* SCORING BUTTONS */
+        .score-btns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 100%; }
+        .btn-pts { padding: 12px 2px; border: none; border-radius: 8px; color: white; font-weight: 800; cursor: pointer; font-size: 0.75rem; transition: 0.2s; letter-spacing: 0.5px; box-shadow: 0 2px 2px rgba(0,0,0,0.1); }
+        .btn-pts:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.15); }
         .btn-pts:active { transform: scale(0.95); }
+        
         .rank-tag { font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; color: white; font-weight: bold; text-transform: uppercase; display: inline-block; margin-top: 5px; }
 
         /* MODALS */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
-        .modal { background: white; padding: 30px; border-radius: 15px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+        .modal { background: white; padding: 30px; border-radius: 15px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; animation: slideUp 0.3s ease-out; }
         .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .stat-box { padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary); background: #f8fafc; text-align: center; }
         
-        /* TOAST */
-        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; }
-        .toast { background: var(--dark); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 500; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); animation: slideUp 0.3s forwards; }
+        .sortable-ghost { opacity: 0.4; background: var(--info) !important; }
+
+        /* ANIMATIONS */
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes popScore { 0% { transform: scale(1); } 50% { transform: scale(1.5); color: var(--gold); } 100% { transform: scale(1); } }
+        .pop-anim { animation: popScore 0.4s ease-in-out; }
+
+        /* TOAST NOTIFICATION */
+        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 10px; }
+        .toast { background: var(--dark); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 500; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s forwards; }
+        .toast.success { background: var(--success); }
+        .toast.danger { background: var(--danger); }
     </style>
 </head>
 <body onload="init()">
@@ -73,19 +83,19 @@
 <div class="desktop-container">
     <div class="sidebar">
         <header>
-            <h2 style="margin:0; font-weight: 900; letter-spacing: 1px;"><i class="fas fa-crown"></i> MERIT ADMIN</h2>
+            <h2 style="margin:0; font-weight: 900; letter-spacing: 1px;"><i class="fas fa-gem"></i> MERIT ADMIN</h2>
             <small style="opacity:0.9; font-size: 0.9rem;">SMK Mat Salleh Ranau</small>
             <div id="syncStatus" class="sync-badge" style="margin-top:10px">Menghubungkan...</div>
         </header>
 
         <div class="stats-grid">
             <div class="stat-box" style="border-color:var(--success)">
-                <small style="font-weight:bold; color:#64748b">TOTAL PELAJAR</small>
+                <small style="font-weight:bold; color:#64748b">JUMLAH MERIT</small>
                 <div id="mSum" style="font-size:1.6rem; font-weight:900; color:var(--success)">0</div>
             </div>
-            <div class="stat-box" style="border-color:var(--gold)">
-                <small style="font-weight:bold; color:#64748b">TOTAL POINTS</small>
-                <div id="dSum" style="font-size:1.6rem; font-weight:900; color:var(--gold)">0</div>
+            <div class="stat-box" style="border-color:var(--danger)">
+                <small style="font-weight:bold; color:#64748b">JUMLAH PENALTI</small>
+                <div id="dSum" style="font-size:1.6rem; font-weight:900; color:var(--danger)">0</div>
             </div>
         </div>
 
@@ -94,16 +104,17 @@
         <div class="admin-controls" id="controlPanel" style="display:none">
             <button class="btn-action" style="background:var(--success)" onclick="openM('addM')"><i class="fas fa-user-plus"></i> Pelajar</button>
             <button class="btn-action" style="background:var(--info)" onclick="openM('addClassM')"><i class="fas fa-folder-plus"></i> Kelas</button>
-            <button class="btn-action" style="background:var(--warning)" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
-            <button class="btn-action" style="background:var(--dark)" onclick="exportCSV()"><i class="fas fa-download"></i> CSV</button>
-            <button class="btn-action" style="background:var(--danger); grid-column: span 2;" onclick="openM('resetM')"><i class="fas fa-trash-alt"></i> RESET MARKAH KELAS</button>
-            <button class="btn-action" style="background:#475569; grid-column: span 2; margin-top:10px" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            <button class="btn-action" style="background:var(--warning)" onclick="exportPDF()"><i class="fas fa-file-pdf"></i> Cetak PDF</button>
+            <button class="btn-action" style="background:var(--dark)" onclick="exportCSV()"><i class="fas fa-download"></i> Backup CSV</button>
+            <button class="btn-action" style="background:var(--danger); border:2px solid white" onclick="openM('resetM')"><i class="fas fa-sync-alt"></i> Reset Skor</button>
+            <button class="btn-action" style="background:var(--danger)" onclick="delClass()"><i class="fas fa-trash"></i> Buang Kelas</button>
+            <button class="btn-action" style="background:var(--dark); grid-column: span 2; margin-top:10px" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout Admin</button>
         </div>
 
         <div id="loginArea">
             <div style="text-align:center; margin-bottom:20px; color:#64748b;"><i class="fas fa-lock fa-4x"></i></div>
-            <input type="password" id="passInput" placeholder="Katalaluan Admin" style="width:100%; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px; font-size:1rem; text-align:center;" onkeypress="if(event.key==='Enter') checkLogin()">
-            <button class="btn-action" style="background:var(--primary); width:100%; padding: 15px;" onclick="checkLogin()">MASUK SYSTEM</button>
+            <input type="password" id="passInput" placeholder="Katalaluan Admin" style="width:100%; padding:15px; border-radius:8px; border:1px solid #ddd; margin-bottom:15px; font-size:1rem;" onkeypress="if(event.key==='Enter') checkLogin()">
+            <button class="btn-action" style="background:var(--primary); width:100%; padding: 15px;" onclick="checkLogin()">MASUK MOD ADMIN</button>
         </div>
     </div>
 
@@ -117,9 +128,9 @@
                 <thead>
                     <tr>
                         <th style="width: 50px; text-align:center;">#</th>
-                        <th>NAMA PELAJAR</th>
-                        <th style="text-align:center; width: 100px">MARKAH</th>
-                        <th id="thAction" style="display:none; width: 320px;">PANEL MARKAH</th>
+                        <th>Leaderboard (Hall of Fame)</th>
+                        <th style="text-align:center; width: 100px">Points</th>
+                        <th id="thAction" style="display:none; width: 340px;">Panel Kawalan Guru</th>
                     </tr>
                 </thead>
                 <tbody></tbody>
@@ -130,34 +141,36 @@
 
 <div id="addM" class="overlay"><div class="modal">
     <h3>Tambah Pelajar</h3>
-    <input type="text" id="newName" placeholder="Nama Penuh Pelajar (Huruf Besar)" onkeypress="if(event.key==='Enter') saveNew()">
-    <button class="btn-action" style="background:var(--success); width:100%" onclick="saveNew()">Simpan</button>
+    <input type="text" id="newName" placeholder="Nama Penuh Pelajar" onkeypress="if(event.key==='Enter') saveNew()">
+    <button class="btn-action" style="background:var(--success); width:100%" onclick="saveNew()">Simpan Pelajar</button>
     <button class="btn-action" style="background:#e2e8f0; width:100%; margin-top:10px; color:black" onclick="closeM('addM')">Batal</button>
 </div></div>
 
 <div id="addClassM" class="overlay"><div class="modal">
-    <h3>Tambah Kelas</h3>
+    <h3>Tambah Kelas Baru</h3>
     <input type="text" id="newClassName" placeholder="Contoh: 4 SETIA" onkeypress="if(event.key==='Enter') saveNewClass()">
-    <button class="btn-action" style="background:var(--info); width:100%" onclick="saveNewClass()">Simpan</button>
+    <button class="btn-action" style="background:var(--info); width:100%" onclick="saveNewClass()">Tambah Kelas</button>
     <button class="btn-action" style="background:#e2e8f0; width:100%; margin-top:10px; color:black" onclick="closeM('addClassM')">Batal</button>
 </div></div>
 
-<div id="resetM" class="overlay"><div class="modal" style="border-top: 5px solid var(--danger);">
-    <h3 style="color:var(--danger)">AMARAN!</h3>
-    <p>Adakah anda pasti mahu memadam <b>SEMUA MARKAH</b> untuk kelas <br><b id="resetClassName" style="font-size:1.2rem"></b>?</p>
-    <button class="btn-action" style="background:var(--danger); width:100%" onclick="confirmReset()">YA, PADAM SEMUA</button>
-    <button class="btn-action" style="background:#e2e8f0; width:100%; margin-top:10px; color:black" onclick="closeM('resetM')">BATAL</button>
+<div id="resetM" class="overlay"><div class="modal" style="border-top: 10px solid var(--danger);">
+    <h3 style="color:var(--danger)">PENGESAHAN RESET</h3>
+    <p>Kosongkan semua skor untuk kelas: <br><b id="resetClassName" style="font-size:1.2rem"></b>?</p>
+    <button class="btn-action" style="background:var(--danger); width:100%" onclick="confirmReset()">Ya, Reset Skor</button>
+    <button class="btn-action" style="background:#e2e8f0; width:100%; margin-top:10px; color:black" onclick="closeM('resetM')">Batal</button>
 </div></div>
 
 <script>
-    // --- LINK BARU TUAN ---
-    const CLOUD_URL = "https://script.google.com/macros/s/AKfycbwbI3aEh2q7IqIsQpZ7DFX2JuQFWbrFv3MASzCsMHHFmQTX8HXpR-oPK8L4FmSS_Wye/exec";
-    
-    // PASSWORD: apipfathan@123
+    // CONFIGURATION (LINK SCRIPT BARU TUAN)
+    const CLOUD_URL = "https://script.google.com/macros/s/AKfycbw8gWAH5xpdKATiCC33VL3GcIUnRMGqms0NYsSXDVLZQxOGTMNKRWyG7d5xxGf-T0-X/exec";
     const SECRET_KEY = "YXBpcGZhdGhhbkAxMjM="; 
-    const STORAGE_KEY = "ARABIC_DB_FINAL";
+    const STORAGE_KEY = "ARABIC_DESKTOP_DB_V13";
     
-    let db = [], classes = [], activeCls = "", isAdmin = false, chart;
+    let db = [];
+    let classes = [];
+    let activeCls = "";
+    let isAdmin = false;
+    let chart;
 
     async function init() {
         const local = localStorage.getItem(STORAGE_KEY);
@@ -168,35 +181,36 @@
 
     async function loadCloud() {
         try {
-            status("🔄 Syncing...", "color:#ca8a04");
             const res = await fetch(CLOUD_URL);
             const data = await res.json();
             if(data.length > 0) {
+                // Map data supaya konsisten
                 db = data.map(r => ({ n: String(r.n || r[0]), s: parseInt(r.s || r[1]) || 0, c: String(r.c || r[2]) }));
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
                 updateClassList();
-                status("✅ Online", "color:var(--success)");
+                status("● Cloud Connected", "color:var(--success)");
             }
             refresh();
-        } catch (e) { status("⚠️ Offline", "color:#dc2626"); }
+        } catch (e) { status("● Offline Mode", "color:var(--warning)"); }
     }
 
     async function sync() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        // Kita hantar semua data terus (lebih selamat)
         const rows = db.map(p => [p.n, p.s, p.c]);
         try {
-            // GUNA "bulk_update" UNTUK HYBRID SCRIPT
+            // Hantar data ke script dengan kaedah bulk update
             await fetch(CLOUD_URL, { 
                 method: "POST", 
                 mode: 'no-cors', 
                 body: JSON.stringify({ action: "bulk_update", data: rows }) 
             });
-            status("✅ Saved", "color:var(--success)");
-        } catch (e) { status("⚠️ Save Error", "color:#dc2626"); }
+            status("● Cloud Synced", "color:var(--success)");
+        } catch (e) { status("● Sync Error", "color:var(--danger)"); }
     }
 
     function updateClassList() {
-        const currentClasses = [...new Set(db.map(x => x.c))].sort();
+        const currentClasses = [...new Set(db.map(x => x.c))];
         if(classes.length === 0) classes = currentClasses;
         else {
             currentClasses.forEach(c => { if(!classes.includes(c)) classes.push(c); });
@@ -210,9 +224,10 @@
     function initSortable() {
         new Sortable(document.getElementById('tabContainer'), {
             animation: 150,
+            ghostClass: 'sortable-ghost',
             onEnd: function() {
                 classes = Array.from(document.getElementById('tabContainer').children).map(b => b.innerText);
-                renderTabs();
+                sync();
             }
         });
     }
@@ -230,9 +245,6 @@
         tbody.innerHTML = "";
         let list = db.filter(x => x.c === activeCls).sort((a,b) => b.s - a.s);
         
-        document.getElementById('mSum').innerText = list.length;
-        document.getElementById('dSum').innerText = list.reduce((a,b)=>a+b.s,0);
-
         list.forEach((p, idx) => {
             if(!p.n.toUpperCase().includes(q)) return;
             const rank = getRank(p.s);
@@ -246,61 +258,80 @@
             tr.innerHTML = `
                 <td style="font-weight:bold; font-size:1.2rem; text-align:center">${rankDisplay}</td>
                 <td>
-                    <div style="font-weight:700; font-size:1rem;">${p.n}</div>
+                    <div style="font-weight:700; font-size:1.05rem; margin-bottom:4px">${p.n}</div>
                     <span class="rank-tag" style="background:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</span>
                 </td>
                 <td style="text-align:center;">
-                    <div style="font-size:1.5rem; font-weight:900; color:${p.s>0?'var(--primary)':'#cbd5e1'}">${p.s}</div>
+                    <div id="score-${idx}" style="font-size:1.8rem; font-weight:900; color:${p.s === 0 ? '#cbd5e1' : 'var(--primary)'}">${p.s}</div>
                 </td>
                 ${isAdmin ? `<td>
-                    <div style="display: flex; gap: 5px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="score-btns">
-                            <button class="btn-pts" style="background:#16a34a" onclick="mod('${p.n}', 4)">📖 HAFAL (+4)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -4)">❌ T.HAFAL (-4)</button>
+                            <button class="btn-pts" style="background:#16a34a" onclick="mod('${p.n}', 4, ${idx})">📖 HAFAL (+4)</button>
+                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -4, ${idx})">❌ T.HAFAL (-4)</button>
                             
-                            <button class="btn-pts" style="background:#2563eb" onclick="mod('${p.n}', 8)">📝 SIAP (+8)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -8)">❌ T.SIAP (-8)</button>
+                            <button class="btn-pts" style="background:#2563eb" onclick="mod('${p.n}', 8, ${idx})">📝 SIAP (+8)</button>
+                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -8, ${idx})">❌ T.SIAP (-8)</button>
                             
-                            <button class="btn-pts" style="background:var(--gold); color:black; grid-column:span 2;" onclick="mod('${p.n}', 10)">🔥 EARLY BIRD (+10)</button>
+                            <button class="btn-pts" style="background:var(--gold); color:black; border:1px solid #d97706" onclick="mod('${p.n}', 10, ${idx})">⚡ EARLY (+10)</button>
 
-                            <button class="btn-pts" style="background:#0891b2" onclick="mod('${p.n}', 5)">👋 HADIR (+5)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -8)">🚫 T.HADIR (-8)</button>
+                            <button class="btn-pts" style="background:#0891b2" onclick="mod('${p.n}', 5, ${idx})">👋 HADIR (+5)</button>
+                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -8, ${idx})">🚫 T.HADIR (-8)</button>
                             
-                            <button class="btn-pts" style="background:#8b5cf6" onclick="mod('${p.n}', 1)">⭐ TERPUJI (+1)</button>
-                            <button class="btn-pts" style="background:#1e293b" onclick="mod('${p.n}', -1)">⚠️ DISIPLIN (-1)</button>
+                            <button class="btn-pts" style="background:#8b5cf6" onclick="mod('${p.n}', 1, ${idx})">⭐ TERPUJI (+1)</button>
+                            <button class="btn-pts" style="background:#1e293b" onclick="mod('${p.n}', -1, ${idx})">⚠️ DISIPLIN (-1)</button>
                         </div>
-                        <button onclick="delStu('${p.n}')" style="border:none; background:none; color:#cbd5e1; cursor:pointer;"><i class="fas fa-trash"></i></button>
+                        <button onclick="delStu('${p.n}')" style="border:none; background:none; color:#cbd5e1; cursor:pointer; font-size:1rem; margin-left:5px"><i class="fas fa-trash"></i></button>
                     </div>
                 </td>` : ''}
             `;
             tbody.appendChild(tr);
         });
         updateChart(list.slice(0,5));
+        updateStats(list);
     }
 
-    function mod(n, v) {
+    function mod(n, v, idx) {
         const p = db.find(x => x.n === n && x.c === activeCls);
         if(p) { 
-            p.s += v; if(p.s < 0) p.s = 0;
-            refresh(); sync(); 
-            showToast(`${n}: ${v>0?'+':''}${v}`);
+            p.s += v; 
+            if(p.s < 0) p.s = 0; // Tak boleh negatif
+            refresh(); 
+            sync(); 
+            showToast(`${n}: ${v>0?'+':''}${v}`, v>0 ? 'success':'danger');
+            
+            const el = document.getElementById(`score-${idx}`);
+            if(el) {
+                el.classList.remove('pop-anim');
+                void el.offsetWidth; 
+                el.classList.add('pop-anim');
+            }
         }
     }
 
-    function showToast(msg) {
+    function showToast(msg, type) {
         const c = document.getElementById('toast-container');
         const t = document.createElement('div');
-        t.className = 'toast'; t.innerText = msg;
-        c.appendChild(t); setTimeout(() => t.remove(), 2000);
+        t.className = `toast ${type}`;
+        t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`;
+        c.appendChild(t);
+        setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(), 300) }, 2000);
     }
 
     function delStu(n) {
-        if(confirm(`Padam pelajar ${n}?`)) { db = db.filter(x => !(x.n === n && x.c === activeCls)); refresh(); sync(); }
+        if(confirm(`Padam pelajar ${n}?`)) { db = db.filter(x => !(x.n === n && x.c === activeCls)); refresh(); sync(); showToast("Pelajar dipadam", "danger"); }
+    }
+
+    function delClass() {
+        if(confirm(`AWAS! Padam KELAS ${activeCls}?`)) {
+            db = db.filter(x => x.c !== activeCls);
+            activeCls = ""; updateClassList(); refresh(); sync();
+        }
     }
 
     function confirmReset() {
         db.forEach(p => { if(p.c === activeCls) p.s = 0; });
-        refresh(); sync(); closeM('resetM');
+        refresh(); sync(); closeM('resetM'); showToast("Markah di-reset", "danger");
     }
 
     function updateChart(data) {
@@ -310,10 +341,17 @@
             type: 'doughnut',
             data: {
                 labels: data.map(x => x.n.split(' ')[0]),
-                datasets: [{ data: data.map(x => x.s), backgroundColor: ['#ca8a04','#94a3b8','#cd7f32','#4f46e5','#6366f1'], borderWidth: 0 }]
+                datasets: [{ data: data.map(x => x.s), backgroundColor: ['#ca8a04','#94a3b8','#cd7f32','#4f46e5','#6366f1'], borderWeight: 0 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 } } } } }
         });
+    }
+
+    function updateStats(list) {
+        let m = 0, d = 0;
+        list.forEach(p => { if(p.s > 0) m += p.s; else d += Math.abs(p.s); });
+        document.getElementById('mSum').innerText = m;
+        document.getElementById('dSum').innerText = d;
     }
 
     function checkLogin() {
@@ -323,38 +361,60 @@
             document.getElementById('loginArea').style.display = 'none';
             document.getElementById('controlPanel').style.display = 'grid';
             document.getElementById('thAction').style.display = 'table-cell';
+            showToast("Log Masuk Berjaya", "success");
             refresh();
-        } else { alert("Salah password!"); }
+        } else {
+            showToast("Katalaluan Salah!", "danger");
+        }
     }
 
     function logout() { location.reload(); }
-    function status(m, s) { const el = document.getElementById('syncStatus'); el.innerText = m; el.style = s; }
-    function openM(id) { if(id === 'resetM') document.getElementById('resetClassName').innerText = activeCls; document.getElementById(id).style.display = 'flex'; }
-    function closeM(id) { document.getElementById(id).style.display = 'none'; }
-
+    
     function renderTabs() { 
         document.getElementById('tabContainer').innerHTML = classes.map(c => `<button class="tab-btn ${c===activeCls?'active':''}" onclick="setCls('${c}')">${c}</button>`).join(''); 
     }
-    function setCls(c) { activeCls = c; refresh(); renderTabs(); }
     
+    function setCls(c) { 
+        activeCls = c;
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => {
+            if(btn.innerText === c) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        refresh(); 
+    }
+    
+    function status(m, s) { const el = document.getElementById('syncStatus'); el.innerText = m; el.style = s; }
+    
+    function openM(id) { 
+        if(id === 'resetM') document.getElementById('resetClassName').innerText = activeCls;
+        document.getElementById(id).style.display = 'flex'; 
+    }
+    function closeM(id) { document.getElementById(id).style.display = 'none'; }
+
     function saveNew() {
         const n = document.getElementById('newName').value.toUpperCase().trim();
-        if(n) { db.push({n, s:0, c:activeCls}); sync(); refresh(); closeM('addM'); document.getElementById('newName').value=""; }
+        if(n) { db.push({n, s:0, c:activeCls}); sync(); refresh(); closeM('addM'); document.getElementById('newName').value=""; showToast("Pelajar Ditambah", "success"); }
     }
+
     function saveNewClass() {
         const c = document.getElementById('newClassName').value.toUpperCase().trim();
-        if(c && !classes.includes(c)) { db.push({n: "PELAJAR 1", s:0, c:c}); activeCls = c; updateClassList(); sync(); refresh(); closeM('addClassM'); }
+        if(c && !classes.includes(c)) { db.push({n: "PELAJAR PERTAMA", s:0, c:c}); activeCls = c; updateClassList(); sync(); refresh(); closeM('addClassM'); showToast("Kelas Ditambah", "info"); }
     }
+
     function exportPDF() {
         const { jsPDF } = window.jspdf; const d = new jsPDF();
-        d.text(`MERIT: ${activeCls}`, 14, 15);
-        d.autoTable({ head:[['Nama','Markah']], body: db.filter(x=>x.c===activeCls).sort((a,b)=>b.s-a.s).map(p=>[p.n, p.s]), startY: 20 });
-        d.save(`Laporan.pdf`);
+        d.text(`LAPORAN MERIT: ${activeCls}`, 14, 15);
+        d.autoTable({ head:[['No','Nama','Skor','Rank']], body: db.filter(x=>x.c===activeCls).sort((a,b)=>b.s-a.s).map((p,i)=>[i+1, p.n, p.s, getRank(p.s).l]), startY: 20 });
+        d.save(`Laporan_${activeCls}.pdf`);
+        showToast("PDF Dimuat Turun", "success");
     }
+
     function exportCSV() {
-        let csv = "Nama,Markah,Kelas\n" + db.map(p => `"${p.n}",${p.s},${p.c}`).join("\n");
+        let csv = "Nama,Skor,Kelas\n" + db.map(p => `"${p.n}",${p.s},${p.c}`).join("\n");
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
-        a.download = `Backup.csv`; a.click();
+        a.download = `Backup_Master.csv`; a.click();
+        showToast("CSV Dimuat Turun", "success");
     }
 </script>
 </body>
