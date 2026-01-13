@@ -20,26 +20,21 @@
         
         body {
             background-color: var(--dark); color: var(--text);
-            font-family: 'Poppins', sans-serif; margin: 0; padding: 0;
-            overflow-x: hidden;
+            font-family: 'Poppins', sans-serif; margin: 0; padding: 0; overflow-x: hidden;
         }
 
-        /* --- START SCREEN --- */
         #start-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.95); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
         }
         .start-btn {
             background: var(--gold); color: black; border: none; padding: 15px 40px;
-            font-size: 1.5rem; font-family: 'Orbitron'; font-weight: bold;
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%);
-            cursor: pointer; animation: pulse 1.5s infinite; margin-top: 20px;
+            font-size: 1.5rem; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; 
+            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); animation: pulse 1.5s infinite; margin-top: 20px;
         }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 20px var(--gold); } 100% { transform: scale(1); } }
 
-        /* --- AUDIO PANEL --- */
         #audioPanel {
             position: fixed; bottom: 20px; right: 20px; z-index: 100;
             background: rgba(0,0,0,0.6); padding: 10px; border-radius: 30px;
@@ -49,16 +44,13 @@
         #audioPanel.visible { opacity: 1; visibility: visible; }
         .audio-btn { background: none; border: none; color: var(--gold); font-size: 1.2rem; cursor: pointer; }
 
-        /* --- MAIN LAYOUT --- */
         .header { text-align: center; padding: 20px; background: linear-gradient(to bottom, #1e293b, #0f172a); border-bottom: 2px solid var(--gold); }
         .logo { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; background: #000; }
         h1 { font-family: 'Orbitron'; color: var(--gold); margin: 10px 0 0; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); letter-spacing: 2px; }
 
-        /* --- CONTROLS --- */
         .controls { padding: 15px; display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin: 0 auto; }
         #search { padding: 12px; border-radius: 8px; border: 1px solid #475569; background: #334155; color: white; text-align: center; font-family: 'Orbitron'; }
         
-        /* TABS KELAS */
         .tabs { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 5px; justify-content: center; }
         .tab-btn {
             background: #334155; color: #94a3b8; border: none; padding: 8px 15px;
@@ -66,7 +58,6 @@
         }
         .tab-btn.active { background: var(--gold); color: black; box-shadow: 0 0 10px var(--gold); }
 
-        /* --- PODIUM (TOP 3) --- */
         .podium-container {
             display: flex; justify-content: center; align-items: flex-end; gap: 10px;
             margin: 20px auto; max-width: 500px; height: 220px;
@@ -84,18 +75,15 @@
         .p-score { font-family: 'Orbitron'; font-size: 1.5rem; font-weight: bold; color: white; margin: 5px 0; }
         .p-name { font-size: 0.8rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
-        /* --- LIST SENARAI --- */
         .list-container { max-width: 600px; margin: 0 auto; padding: 0 15px 80px; }
         .student-row {
             display: flex; justify-content: space-between; align-items: center;
             background: var(--card); margin-bottom: 8px; padding: 15px;
-            border-radius: 8px; border: 1px solid #334155; cursor: pointer;
-            transition: 0.2s;
+            border-radius: 8px; border: 1px solid #334155; cursor: pointer; transition: 0.2s;
         }
         .student-row:hover { transform: translateX(5px); border-color: var(--gold); }
         .s-score { font-family: 'Orbitron'; font-size: 1.2rem; font-weight: bold; }
 
-        /* --- MODAL CARD --- */
         .modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.9); z-index: 9999;
@@ -112,18 +100,13 @@
             background: rgba(255,255,255,0.1); display: inline-block; padding: 5px 15px; 
             border-radius: 20px; margin-bottom: 15px; font-family: 'Orbitron'; letter-spacing: 2px;
         }
-        
-        /* Loading Spinner Button */
         .spinning { animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
     </style>
 </head>
 <body onload="init()">
 
-    <audio id="bgm" loop>
-        <source src="music.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bgm" loop><source src="music.mp3" type="audio/mpeg"></audio>
 
     <div id="start-screen">
         <img src="logo.png" class="logo" style="width:150px; height:150px; margin-bottom:20px;">
@@ -146,15 +129,11 @@
 
     <div class="controls">
         <input type="text" id="search" placeholder="🔍 Cari Nama Pelajar..." onkeyup="renderList()">
-        <div class="tabs" id="tabs">
-            </div>
+        <div class="tabs" id="tabs"></div>
     </div>
 
-    <div class="podium-container" id="podium">
-        </div>
-
-    <div class="list-container" id="list">
-        </div>
+    <div class="podium-container" id="podium"></div>
+    <div class="list-container" id="list"></div>
 
     <div id="card-modal" class="modal" onclick="if(event.target==this) closeCard()">
         <div class="card-box" id="capture-area">
@@ -162,15 +141,12 @@
             <img src="logo.png" style="width:60px; height:60px; border-radius:50%; border:2px solid var(--gold); margin-bottom:10px;">
             <h2 style="margin:0; font-size:1.5rem;" id="m-name">NAMA PELAJAR</h2>
             <div id="m-desc" style="color:#94a3b8; font-style:italic; font-size:0.9rem; margin-bottom:15px;">"Usaha tangga kejayaan!"</div>
-            
             <div class="rank-badge" id="m-rank-badge">RANK</div>
-            
             <div style="background:rgba(0,0,0,0.5); padding:15px; border-radius:10px; margin-bottom:20px;">
                 <i id="m-rank-icon" class="fas fa-star" style="font-size:2rem; margin-bottom:5px;"></i>
                 <div style="font-size:3rem; font-family:'Orbitron'; color:white; line-height:1;" id="m-score">0</div>
                 <div style="color:#94a3b8; font-size:0.8rem;">TOTAL MERIT</div>
             </div>
-
             <button onclick="shareCard()" style="background:var(--gold); border:none; padding:10px 20px; border-radius:20px; font-weight:bold; cursor:pointer;">
                 <i class="fas fa-share-alt"></i> SAVE CARD
             </button>
@@ -178,20 +154,19 @@
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        // PASTE URL SCRIPT GOOGLE APPS SCRIPT ANDA DI SINI
-        const API_URL = "https://script.google.com/macros/s/AKfycbw8gWAH5xpdKATiCC33VL3GcIUnRMGqms0NYsSXDVLZQxOGTMNKRWyG7d5xxGf-T0-X/exec";
+        // --- LINK BARU TUAN ---
+        const API_URL = "https://script.google.com/macros/s/AKfycbwbI3aEh2q7IqIsQpZ7DFX2JuQFWbrFv3MASzCsMHHFmQTX8HXpR-oPK8L4FmSS_Wye/exec";
         
         const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
 
         let db = [], classes = [], activeCl = "";
         let isMuted = false, lastVol = 0.7;
         let audioCoin = new Audio(COIN_SFX);
-        let lastDataFingerprint = ""; // VARIABLE PENTING (ANTI KELIP)
+        let lastDataFingerprint = "";
 
         function init() {
             fetchData(); 
-            setInterval(() => { fetchData(true); }, 5000); // Check setiap 5 saat
+            setInterval(() => { fetchData(true); }, 5000); 
         }
 
         async function fetchData(isSilent = false) {
@@ -199,81 +174,54 @@
                 const res = await fetch(API_URL);
                 const data = await res.json();
                 
-                // --- TEKNIK ANTI KELIP ---
+                // ANTI-KELIP CHECK
                 const newFingerprint = JSON.stringify(data);
-                if (newFingerprint === lastDataFingerprint) {
-                    if(!isSilent) console.log("Data sama, tiada refresh.");
-                    return; // STOP DI SINI KALAU DATA SAMA
-                }
-                
-                console.log("Data baru! Updating...");
+                if (newFingerprint === lastDataFingerprint) return;
                 lastDataFingerprint = newFingerprint;
                 
                 db = data.map(x => ({ n: String(x.n), s: parseInt(x.s) || 0, c: String(x.c) }));
-                
-                // Set Kelas
-                const prevClass = activeCl;
                 classes = [...new Set(db.map(x => x.c))].sort();
                 if(!activeCl && classes.length > 0) activeCl = classes[0];
 
                 renderTabs();
-                renderList(); // Auto refresh paparan
+                renderList();
 
             } catch (e) { console.error("Error:", e); }
         }
 
         async function manualRefresh(btn) {
-            btn.classList.add('spinning');
-            lastDataFingerprint = ""; // Force refresh
-            if(navigator.vibrate) navigator.vibrate(30);
-            await fetchData();
-            setTimeout(() => btn.classList.remove('spinning'), 500);
+            btn.classList.add('spinning'); lastDataFingerprint = "";
+            await fetchData(); setTimeout(() => btn.classList.remove('spinning'), 500);
         }
 
         function enterArena() {
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('audioPanel').classList.add('visible');
-            const bgm = document.getElementById('bgm');
-            bgm.volume = lastVol;
-            bgm.play().catch(e => console.log("Audio play blocked"));
-            playSound();
-            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            const bgm = document.getElementById('bgm'); bgm.volume = lastVol; bgm.play();
+            playSound(); confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
         }
 
         function toggleMute() { 
             const bgm = document.getElementById('bgm'); isMuted = !isMuted;
-            if(isMuted) { bgm.pause(); document.getElementById('muteIcon').className = "fas fa-volume-mute"; document.getElementById('volSlider').value = 0; } 
-            else { bgm.play(); bgm.volume = lastVol; document.getElementById('muteIcon').className = "fas fa-volume-up"; document.getElementById('volSlider').value = lastVol; }
+            if(isMuted) { bgm.pause(); document.getElementById('muteIcon').className = "fas fa-volume-mute"; } 
+            else { bgm.play(); document.getElementById('muteIcon').className = "fas fa-volume-up"; }
         }
 
-        function adjustVolume(v) {
-            const bgm = document.getElementById('bgm'); bgm.volume = v; lastVol = v;
-            if(v > 0 && isMuted) { isMuted = false; bgm.play(); document.getElementById('muteIcon').className = "fas fa-volume-up"; }
-        }
-
+        function adjustVolume(v) { document.getElementById('bgm').volume = v; lastVol = v; }
         function playSound() { if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } }
 
         function renderTabs() {
             const tabsContainer = document.getElementById('tabs');
-            const newHTML = classes.map(c => 
-                `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
-            ).join('');
-            
+            const newHTML = classes.map(c => `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`).join('');
             if(tabsContainer.innerHTML !== newHTML) tabsContainer.innerHTML = newHTML;
         }
 
-        function setCl(c) { 
-            activeCl = c; 
-            playSound(); 
-            renderTabs(); 
-            renderList(); 
-        }
+        function setCl(c) { activeCl = c; playSound(); renderTabs(); renderList(); }
 
         function renderList() {
             const q = document.getElementById('search').value.toLowerCase();
             let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
             
-            // Render Podium
             const pod = document.getElementById('podium'); 
             const top3 = list.slice(0,3); const order = [1,0,2]; 
             let podHTML = "";
@@ -289,7 +237,6 @@
             });
             if(pod.innerHTML !== podHTML) pod.innerHTML = podHTML;
 
-            // Render List
             const cont = document.getElementById('list'); 
             let listHTML = "";
             list.forEach((p, i) => {
@@ -326,14 +273,12 @@
         }
 
         function closeCard() { document.getElementById('card-modal').style.display='none'; }
-        
         async function shareCard() {
             const area = document.getElementById('capture-area');
             const canvas = await html2canvas(area, { backgroundColor: '#0f172a', scale: 2 });
             const link = document.createElement('a');
             link.download = `ArabicMerit_${document.getElementById('m-name').innerText}.png`;
-            link.href = canvas.toDataURL();
-            link.click();
+            link.href = canvas.toDataURL(); link.click();
         }
     </script>
 </body>
