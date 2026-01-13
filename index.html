@@ -3,482 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ARABIC HALL OF FAME</title>
+    <title>Hall of Fame - Arabic Merit</title>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
     
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.4.0/dist/confetti.browser.min.js"></script>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
     <style>
-        :root { --gold: #fbbf24; --dark: #0f172a; --card: #1e293b; --text: #f8fafc; --neon: #0ea5e9; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body {
-            background-color: var(--dark); color: var(--text);
-            font-family: 'Poppins', sans-serif; margin: 0; padding: 0; overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
+        :root {
+            --bg-dark: #0f172a;
+            --glass: rgba(30, 41, 59, 0.7);
+            --gold: #fbbf24; --gold-glow: rgba(251, 191, 36, 0.4);
+            --neon: #8b5cf6;
+            --text-main: #f8fafc;
         }
 
-        /* START SCREEN (Wajib untuk Audio) */
+        body {
+            background-color: var(--bg-dark);
+            background-image: radial-gradient(at 50% 0%, #1e1b4b 0%, #020617 80%);
+            color: var(--text-main); font-family: 'Rajdhani', sans-serif;
+            margin: 0; padding-bottom: 80px; overflow-x: hidden; -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- UI COMPONENTS --- */
+        .audio-panel {
+            position: fixed; top: 15px; right: 15px; z-index: 999;
+            background: rgba(15,23,42,0.8); backdrop-filter: blur(10px);
+            padding: 8px 15px; border-radius: 50px; display: flex; align-items: center; gap: 12px;
+            border: 1px solid rgba(255,255,255,0.1); transform: translateY(-100px); transition: 0.3s;
+        }
+        .audio-panel.visible { transform: translateY(0); }
+        .vol-slider { width: 70px; height: 4px; accent-color: var(--gold); cursor: pointer; }
+
+        /* Start Screen */
         #start-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(15, 23, 42, 0.98); z-index: 9999;
+            position: fixed; inset: 0; z-index: 10000; background: #020617;
             display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
         }
-        .start-btn {
-            background: var(--gold); color: black; border: none; padding: 15px 40px; margin-top: 20px;
-            font-size: 1.2rem; font-family: 'Orbitron'; font-weight: bold; cursor: pointer; 
-            clip-path: polygon(10% 0, 100% 0, 90% 100%, 0% 100%); animation: pulse 1.5s infinite;
+        .btn-enter {
+            background: linear-gradient(135deg, #fbbf24, #d97706);
+            color: #000; border: none; padding: 18px 50px;
+            font-size: 1.4rem; font-family: 'Orbitron'; font-weight: 900;
+            border-radius: 50px; cursor: pointer; margin-top: 30px;
+            box-shadow: 0 0 30px var(--gold-glow); animation: pulse 2s infinite;
         }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); box-shadow: 0 0 25px var(--gold); } 100% { transform: scale(1); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        /* AUDIO CONTROLS */
-        #audioPanel {
-            position: fixed; bottom: 20px; right: 20px; z-index: 100;
-            background: rgba(0,0,0,0.6); padding: 8px 15px; border-radius: 30px;
-            display: flex; gap: 10px; align-items: center; border: 1px solid rgba(255,255,255,0.1);
-            opacity: 0; transition: 1s; visibility: hidden; backdrop-filter: blur(5px);
-        }
-        #audioPanel.visible { opacity: 1; visibility: visible; }
-        .audio-btn { background: none; border: none; color: var(--gold); font-size: 1.1rem; cursor: pointer; }
-
-        /* HEADER */
-        .header { text-align: center; padding: 25px 20px; background: linear-gradient(to bottom, #1e293b, #0f172a); border-bottom: 2px solid var(--gold); }
-        .logo-img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; background: #000; box-shadow: 0 0 15px rgba(251, 191, 36, 0.4); }
-        h1 { font-family: 'Orbitron'; color: var(--gold); margin: 10px 0 0; text-shadow: 0 0 10px rgba(251, 191, 36, 0.5); letter-spacing: 2px; font-size: 1.8rem; }
-
-        /* INPUTS & TABS */
-        .controls { padding: 15px; display: flex; flex-direction: column; gap: 10px; max-width: 600px; margin: 0 auto; position: sticky; top: 0; z-index: 50; background: rgba(15,23,42,0.95); backdrop-filter: blur(5px); }
-        #search { padding: 12px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: white; text-align: center; font-family: 'Orbitron'; width: 100%; outline: none; }
-        #search:focus { border-color: var(--gold); }
+        /* Header & Podium */
+        header { text-align: center; padding: 40px 20px 20px; }
+        h1 { font-family: 'Orbitron'; font-size: 2.2rem; margin: 0; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         
-        .tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; justify-content: center; -ms-overflow-style: none; scrollbar-width: none; }
-        .tabs::-webkit-scrollbar { display: none; }
-        .tab-btn {
-            background: #334155; color: #94a3b8; border: none; padding: 8px 16px;
-            border-radius: 20px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.3s;
-        }
-        .tab-btn.active { background: var(--gold); color: black; box-shadow: 0 0 10px rgba(251, 191, 36, 0.4); transform: scale(1.05); }
-
-        /* PODIUM */
         .podium-container {
-            display: flex; justify-content: center; align-items: flex-end; gap: 8px;
-            margin: 20px auto; max-width: 500px; height: 230px; padding-bottom: 20px;
+            display: flex; justify-content: center; align-items: flex-end;
+            height: 260px; gap: 10px; margin: 20px auto 30px; max-width: 600px; padding: 0 15px;
         }
         .podium-card {
-            background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 12px 12px 0 0;
-            text-align: center; padding: 10px; width: 32%; position: relative; cursor: pointer;
-            transition: 0.3s; display: flex; flex-direction: column; justify-content: flex-end;
+            flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 15px 15px 5px 5px;
+            padding-bottom: 10px; cursor: pointer; transition: 0.3s;
         }
-        .podium-card:active { transform: scale(0.95); }
+        .r-1 { height: 100%; border-top: 4px solid var(--gold); order: 2; z-index: 2; box-shadow: 0 0 20px rgba(251,191,36,0.2); }
+        .r-2 { height: 80%; border-top: 4px solid #94a3b8; order: 1; }
+        .r-3 { height: 70%; border-top: 4px solid #b45309; order: 3; }
+        .p-score { font-family: 'Orbitron'; font-size: 1.4rem; font-weight: 800; margin-top: 5px; }
+        .p-name { font-size: 0.8rem; font-weight: 700; width: 90%; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px; color:#cbd5e1;}
+
+        /* List & Tabs */
+        .controls { max-width: 650px; margin: 0 auto; padding: 0 15px; }
+        .tabs { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .tab-btn { background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); padding: 8px 18px; border-radius: 20px; white-space: nowrap; cursor: pointer; }
+        .tab-btn.active { background: var(--neon); color: white; border-color: var(--neon); box-shadow: 0 0 15px rgba(139,92,246,0.4); }
         
-        .r-1 { height: 100%; border-bottom: 6px solid #fbbf24; z-index: 2; box-shadow: 0 -5px 20px rgba(251, 191, 36, 0.2); }
-        .r-1 .crown-icon { color: #fbbf24; filter: drop-shadow(0 0 5px #fbbf24); animation: float 3s ease-in-out infinite; }
-        .r-2 { height: 85%; border-bottom: 6px solid #cbd5e1; }
-        .r-2 .crown-icon { color: #cbd5e1; }
-        .r-3 { height: 75%; border-bottom: 6px solid #b45309; }
-        .r-3 .crown-icon { color: #b45309; }
+        .search-box { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white; margin-bottom: 15px; font-family: 'Rajdhani'; }
 
-        .p-score { font-family: 'Orbitron'; font-size: 1.4rem; font-weight: bold; color: white; margin: 5px 0; }
-        .p-name { font-size: 0.75rem; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: #cbd5e1; font-weight: 600; }
-
-        /* STUDENT LIST */
-        .list-container { max-width: 600px; margin: 0 auto; padding: 0 15px 80px; }
+        .list-container { max-width: 650px; margin: 0 auto; padding: 0 15px; }
         .student-row {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(30, 41, 59, 0.7); margin-bottom: 8px; padding: 15px;
-            border-radius: 10px; border: 1px solid #334155; cursor: pointer; transition: 0.2s;
-            backdrop-filter: blur(4px);
+            background: var(--glass); margin-bottom: 8px; padding: 12px 18px; border-radius: 12px;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.03);
+            animation: fadeIn 0.5s ease;
         }
-        .student-row:hover { transform: translateX(5px); border-color: var(--gold); background: rgba(30, 41, 59, 1); }
-        .s-rank-num { font-family: 'Orbitron'; color: #64748b; font-weight: bold; width: 30px; }
-        .s-info { display: flex; flex-direction: column; }
-        .s-name { font-weight: 700; color: #f1f5f9; font-size: 0.95rem; }
-        .s-badge { font-size: 0.65rem; margin-top: 3px; display: inline-block; }
-        .s-score { font-family: 'Orbitron'; font-size: 1.2rem; font-weight: bold; color: var(--gold); }
+        @keyframes fadeIn { from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+        .s-score { font-family: 'Orbitron'; font-weight: 900; font-size: 1.2rem; color: var(--gold); }
 
-        /* MODAL (POPUP CARD) */
-        .modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.92); z-index: 9999;
-            align-items: center; justify-content: center; backdrop-filter: blur(5px);
-            animation: fadeIn 0.3s;
+        /* Refresh Button */
+        .refresh-btn {
+            position: fixed; bottom: 20px; right: 20px; z-index: 999;
+            background: var(--gold); color: #000; width: 50px; height: 50px; border-radius: 50%;
+            border: none; box-shadow: 0 0 20px rgba(251, 191, 36, 0.4); font-size: 1.2rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s;
         }
-        .card-box {
-            background: linear-gradient(135deg, #1e293b, #0f172a);
-            width: 85%; max-width: 320px; padding: 25px; border-radius: 20px;
-            border: 2px solid var(--gold); text-align: center; position: relative;
-            box-shadow: 0 0 50px rgba(251, 191, 36, 0.2);
-            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .close-btn { position: absolute; top: 15px; right: 15px; color: #fff; font-size: 1.5rem; cursor: pointer; opacity: 0.7; }
-        .rank-badge { 
-            background: rgba(255,255,255,0.1); display: inline-block; padding: 6px 16px; 
-            border-radius: 20px; margin: 15px 0; font-family: 'Orbitron'; letter-spacing: 2px; font-size: 0.9rem;
-        }
-        .share-btn {
-            background: var(--gold); border: none; padding: 12px 25px; border-radius: 30px; 
-            font-weight: bold; cursor: pointer; color: black; margin-top: 15px; font-family: 'Orbitron';
-            display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%;
-            transition: 0.2s;
-        }
-        .share-btn:active { transform: scale(0.95); }
+        .refresh-btn:active { transform: scale(0.9); }
+        .refresh-btn.spinning i { animation: spinIcon 1s linear infinite; }
+        @keyframes spinIcon { 100% { transform: rotate(360deg); } }
 
-        /* ANIMATIONS */
-        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-        @keyframes zoomIn { from{transform:scale(0.8);opacity:0} to{transform:scale(1);opacity:1} }
-        .spinning { animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        /* Modal */
+        #card-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 10000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .player-card { background: linear-gradient(135deg, #1e1b4b, #0f172a); width: 85%; max-width: 320px; padding: 30px; border-radius: 25px; border: 2px solid var(--gold); text-align: center; }
+        .pc-score { font-size: 4rem; font-family: 'Orbitron'; color: var(--gold); margin: 10px 0; font-weight: 900; text-shadow: 0 0 20px var(--gold); }
     </style>
 </head>
 <body onload="init()">
 
-    <audio id="bgm" loop><source src="music.mp3" type="audio/mpeg"></audio>
+<div class="audio-panel" id="audioPanel">
+    <i class="fas fa-volume-up" id="muteIcon" onclick="toggleMute()"></i>
+    <input type="range" class="vol-slider" id="volSlider" min="0" max="1" step="0.1" value="0.7" oninput="adjustVolume(this.value)">
+</div>
 
-    <div id="start-screen">
-        <img src="logo.png" class="logo-img" style="width:120px; height:120px; margin-bottom:20px;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+<div id="start-screen">
+    <div style="font-size:3rem; color:var(--gold); margin-bottom:20px;"><i class="fas fa-crown"></i></div>
+    <h1 style="font-size:1.5rem; color:#94a3b8; letter-spacing:2px; margin:0;">ARABIC MERIT</h1>
+    <h2 style="font-size:2.5rem; margin:5px 0; font-family:'Orbitron'">HALL OF FAME</h2>
+    <div style="margin-bottom:10px; color:#64748b; font-size:0.8rem;">Tap untuk mulakan</div>
+    <button class="btn-enter" onclick="enterArena()">MASUK ARENA</button>
+</div>
+
+<audio id="bgm" preload="auto" loop>
+    <source src="music.mp3" type="audio/mpeg" onerror="audioError()">
+</audio>
+
+<header>
+    <h1>HALL OF FAME</h1>
+    <div style="color:var(--neon); letter-spacing:3px; font-weight:bold; font-size:0.8rem; margin-top:5px;">PEJUANG BAHASA ARAB</div>
+</header>
+
+<div class="controls">
+    <div class="tabs" id="tabs"></div>
+</div>
+
+<div class="podium-container" id="podium"></div>
+
+<div class="controls">
+    <input type="text" class="search-box" id="search" placeholder="Cari nama..." onkeyup="renderList()">
+</div>
+<div class="list-container" id="list"></div>
+
+<button class="refresh-btn" onclick="manualRefresh(this)"><i class="fas fa-sync-alt"></i></button>
+
+<div id="card-modal" onclick="closeCard()">
+    <div class="player-card" id="capture-area" onclick="event.stopPropagation()">
+        <div id="m-rank-badge" style="color:var(--gold); font-family:'Orbitron'; letter-spacing:2px; margin-bottom:10px;">KHALIFAH</div>
+        <i id="m-rank-icon" class="fas fa-crown" style="font-size: 3rem; color:white; margin:10px 0;"></i>
+        <div id="m-name" style="font-size: 1.3rem; font-weight: 800; color:white; margin-top:10px;">NAMA</div>
+        <div class="pc-score" id="m-score">0</div>
+        <div id="m-desc" style="color:#94a3b8; font-style:italic; margin-bottom:25px;">"Usaha tangga kejayaan!"</div>
+        <button onclick="shareCard()" style="background:var(--neon); color:white; border:none; padding:12px; border-radius:15px; width:100%; font-weight:bold; cursor:pointer;">SHARE KAD</button>
+        <div style="margin-top:10px; font-size:0.8rem; color:#64748b; cursor:pointer;" onclick="closeCard()">Tutup</div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
+    const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
+
+    let db = [], classes = [], activeCl = "";
+    let isMuted = false, lastVol = 0.7;
+    let audioCoin = new Audio(COIN_SFX);
+
+    function init() {
+        fetchData(); 
+        setInterval(() => { console.log("Auto-updating..."); fetchData(true); }, 10000); 
+    }
+
+    async function fetchData(isSilent = false) {
+        try {
+            const res = await fetch(API_URL);
+            const data = await res.json();
+            db = data.map(x => ({ n: String(x[0]), s: parseInt(x[1]) || 0, c: String(x[2]) }));
+            
+            const prevClass = activeCl;
+            classes = [...new Set(db.map(x => x.c))];
+            if(!activeCl && classes.length > 0) activeCl = classes[0];
+
+            renderTabs();
+            renderList();
+        } catch (e) { console.error("Connection error"); }
+    }
+
+    async function manualRefresh(btn) {
+        btn.classList.add('spinning');
+        if(navigator.vibrate) navigator.vibrate(30);
+        await fetchData();
+        setTimeout(() => btn.classList.remove('spinning'), 500);
+    }
+
+    // --- AUDIO SYSTEM (MP3) ---
+    
+    function audioError() {
+        alert("ALERT: Fail 'music.mp3' tidak dijumpai di GitHub!\n\nSila pastikan:\n1. Fail telah diupload.\n2. Ejaan nama fail ialah 'music.mp3' (huruf kecil).");
+    }
+
+    function enterArena() {
+        document.getElementById('start-screen').style.display = 'none';
+        document.getElementById('audioPanel').classList.add('visible');
         
-        <h1 style="font-size: 2rem; margin-bottom: 5px;">HALL OF FAME</h1>
-        <p style="color: #94a3b8; letter-spacing: 1px;">SMK MAT SALLEH RANAU</p>
-        <button class="start-btn" onclick="enterArena()">MASUK ARENA</button>
-        <small style="color:#64748b; margin-top:20px; font-size:0.7rem">Tap untuk aktifkan audio</small>
-    </div>
-
-    <div id="audioPanel">
-        <button class="audio-btn" onclick="toggleMute()"><i id="muteIcon" class="fas fa-volume-up"></i></button>
-        <input type="range" id="volSlider" min="0" max="1" step="0.1" value="0.7" style="width: 60px; accent-color: var(--gold);" oninput="adjustVolume(this.value)">
-        <div style="width:1px; height:15px; background:rgba(255,255,255,0.2); margin:0 5px;"></div>
-        <button class="audio-btn" onclick="manualRefresh(this)"><i class="fas fa-sync-alt"></i></button>
-    </div>
-
-    <div class="header">
-        <img src="logo.png" class="logo-img" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
-        <h1>HALL OF FAME</h1>
-        <div style="color: #fbbf24; font-size: 0.85rem; letter-spacing: 3px; font-weight:bold; margin-top:5px">ARABIC MERIT PRO</div>
-    </div>
-
-    <div class="controls">
-        <input type="text" id="search" placeholder="🔍 Cari Nama Pelajar..." onkeyup="renderList()">
-        <div class="tabs" id="tabs"></div>
-    </div>
-
-    <div class="podium-container" id="podium">
-        <div style="color:#64748b; font-size:0.9rem">Loading data...</div>
-    </div>
-
-    <div class="list-container" id="list"></div>
-
-    <div id="card-modal" class="modal" onclick="if(event.target==this) closeCard()">
-        <div class="card-box" id="capture-area">
-            <div class="close-btn" onclick="closeCard()">&times;</div>
-            
-            <img src="logo.png" style="width:70px; height:70px; border-radius:50%; border:2px solid var(--gold); margin-bottom:10px; object-fit:cover;" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
-            
-            <h2 style="margin:0; font-size:1.4rem; color:white; line-height:1.2" id="m-name">NAMA PELAJAR</h2>
-            <div id="m-desc" style="color:#94a3b8; font-style:italic; font-size:0.8rem; margin-bottom:10px; margin-top:5px;">"Usaha tangga kejayaan!"</div>
-            
-            <div class="rank-badge" id="m-rank-badge">RANK</div>
-            
-            <div style="background:rgba(0,0,0,0.4); padding:20px; border-radius:15px; margin-bottom:15px; border:1px solid rgba(255,255,255,0.1);">
-                <i id="m-rank-icon" class="fas fa-star" style="font-size:2.5rem; margin-bottom:10px; filter:drop-shadow(0 0 10px currentColor)"></i>
-                <div style="font-size:3.5rem; font-family:'Orbitron'; color:white; line-height:1;" id="m-score">0</div>
-                <div style="color:#94a3b8; font-size:0.75rem; text-transform:uppercase; letter-spacing:1px; margin-top:5px">Total Merit Points</div>
-            </div>
-            
-            <button onclick="shareCard()" class="share-btn">
-                <i class="fas fa-download"></i> SIMPAN KAD
-            </button>
-        </div>
-    </div>
-
-    <script>
-        // ================= CONFIGURATION =================
-        // LINK SCRIPT BARU TUAN
-        const API_URL = "https://script.google.com/macros/s/AKfycbwbI3aEh2q7IqIsQpZ7DFX2JuQFWbrFv3MASzCsMHHFmQTX8HXpR-oPK8L4FmSS_Wye/exec";
+        const bgm = document.getElementById('bgm');
+        bgm.volume = lastVol;
         
-        // Sound Effect (Syiling) - Base64 supaya tak perlu file external
-        const COIN_SFX = "data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//uQZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWgAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJlAf/7kGQAAAKkAUAAABHAAAABHAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAAAAAAAAAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESaFwAABoAAAAGgAAAAAAAAAAAAAAAADSb//7kGQAAAH+QcAAACgAAAAAoAAAAEgAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGKQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA//uQZAAABiEFAAAAKAAAAACgAAAAESAAAABIAAAASAAAAAAAAAAAA0gAAAA0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJkAAAD/+5BkAAAGIQUAAAAoAAAAKAAAAARIAAAASAAAAEgAAAAAAAAAAANIAAAANAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACZAAAA";
+        // Browser Policy Requirement: Play audio immediately on click
+        var playPromise = bgm.play();
 
-        // ================= VARIABLES =================
-        let db = [];
-        let classes = [];
-        let activeCl = "";
-        let isMuted = false;
-        let lastVol = 0.7;
-        let audioCoin = new Audio(COIN_SFX);
-        let lastDataFingerprint = ""; // Untuk anti-kelip
-
-        // ================= CORE FUNCTIONS =================
-        function init() {
-            fetchData(); // Load data 1st time
-            // Auto-refresh setiap 5 saat
-            setInterval(() => { fetchData(true); }, 5000); 
-        }
-
-        async function fetchData(isSilent = false) {
-            try {
-                // Fetch data dari Google Sheet
-                const res = await fetch(API_URL);
-                const rawData = await res.json();
-                
-                // ANTI-KELIP: Check kalau data sama, tak payah render balik
-                const newFingerprint = JSON.stringify(rawData);
-                if (newFingerprint === lastDataFingerprint) return;
-                lastDataFingerprint = newFingerprint;
-                
-                // Process Data
-                db = rawData.map(x => ({ 
-                    n: String(x.n), 
-                    s: parseInt(x.s) || 0, 
-                    c: String(x.c) 
-                }));
-
-                // Update Class List
-                const currentClasses = [...new Set(db.map(x => x.c))].sort();
-                
-                // Kalau kelas kosong, guna default
-                if (currentClasses.length === 0) classes = [];
-                else classes = currentClasses;
-
-                // Set kelas aktif kalau belum ada
-                if(!activeCl && classes.length > 0) activeCl = classes[0];
-                
-                renderTabs();
-                renderList();
-
-            } catch (e) { 
-                console.error("Error fetching data:", e);
-                if(!isSilent) document.getElementById('podium').innerHTML = `<div style="color:#ef4444">Gagal menyambung server...</div>`;
-            }
-        }
-
-        function renderTabs() {
-            const tabsContainer = document.getElementById('tabs');
-            if (classes.length === 0) {
-                tabsContainer.innerHTML = `<div style="color:#64748b; font-size:0.8rem">Tiada Data Kelas</div>`;
-                return;
-            }
-            
-            const newHTML = classes.map(c => 
-                `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
-            ).join('');
-            
-            // Render cuma kalau HTML berubah (Extra smooth)
-            if(tabsContainer.innerHTML !== newHTML) tabsContainer.innerHTML = newHTML;
-        }
-
-        function setCl(c) { 
-            activeCl = c; 
-            playSound(); 
-            renderTabs(); 
-            renderList(); 
-        }
-
-        function renderList() {
-            const q = document.getElementById('search').value.toLowerCase();
-            
-            // Filter ikut kelas & Sort ikut Markah (Tinggi -> Rendah)
-            // Kalau markah sama, susun ikut Nama (A -> Z)
-            let list = db.filter(x => x.c === activeCl)
-                         .sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
-            
-            const pod = document.getElementById('podium'); 
-            const cont = document.getElementById('list'); 
-
-            if(list.length === 0) {
-                pod.innerHTML = "";
-                cont.innerHTML = `<div style="text-align:center; padding:20px; color:#64748b">Tiada pelajar dalam kelas ini.</div>`;
-                return;
-            }
-
-            // --- RENDER PODIUM (TOP 3) ---
-            const top3 = list.slice(0,3); 
-            // Susunan Podium: Kiri(2), Tengah(1), Kanan(3)
-            const order = [1, 0, 2]; 
-            let podHTML = "";
-            
-            order.forEach(i => {
-                if(top3[i]) {
-                    const p = top3[i]; 
-                    const rank = i+1; 
-                    const icons = ['👑','🥈','🥉'];
-                    // Paksa rank sebenar: Jika i=1 (item ke-0 dlm array) = Rank 1
-                    // Array order [1,0,2] -> index top3: 1(2nd), 0(1st), 2(3rd)
-                    // Rank display logic:
-                    let displayRank = 0;
-                    if(i===0) displayRank = 2; // Kiri
-                    if(i===1) displayRank = 1; // Tengah
-                    if(i===2) displayRank = 3; // Kanan
-
-                    podHTML += `
-                    <div class="podium-card r-${displayRank}" onclick="showCard('${p.n}',${p.s})">
-                        <div class="crown-icon" style="font-size:1.8rem; margin-bottom:5px;">${i===1 ? '👑' : (i===0 ? '🥈' : '🥉')}</div>
-                        <div class="p-score">${p.s}</div>
-                        <div class="p-name">${p.n.split(" ")[0]}</div>
-                    </div>`;
-                } else {
-                    // Placeholder kosong supaya layout tak lari
-                     podHTML += `<div style="width:32%"></div>`;
-                }
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                console.log("Audio playing (music.mp3).");
+            })
+            .catch(error => {
+                console.log("Audio Error: " + error);
+                // Jika file wujud tapi browser block
+                alert("Muzik wujud tapi diblock oleh phone.\n\nSila pastikan 'Silent Mode' (Suis Tepi iPhone) dimatikan.");
             });
-            pod.innerHTML = podHTML;
+        }
+        
+        playSound();
+        confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+    }
 
-            // --- RENDER LIST (ALL STUDENTS) ---
-            let listHTML = "";
-            list.forEach((p, i) => {
-                // Search Filter
-                if(q && !p.n.toLowerCase().includes(q)) return;
+    function toggleMute() { 
+        const bgm = document.getElementById('bgm');
+        isMuted = !isMuted;
+        
+        if(isMuted) {
+            bgm.pause();
+            document.getElementById('muteIcon').className = "fas fa-volume-mute";
+            document.getElementById('volSlider').value = 0;
+        } else {
+            bgm.play();
+            bgm.volume = lastVol;
+            document.getElementById('muteIcon').className = "fas fa-volume-up";
+            document.getElementById('volSlider').value = lastVol;
+        }
+    }
 
-                const rank = getRank(p.s);
-                const isTop3 = i < 3;
-                
-                listHTML += `
-                <div class="student-row" style="${isTop3 ? 'border-left:4px solid '+rank.c : ''}" onclick="showCard('${p.n}',${p.s})">
-                    <div style="display:flex; gap:12px; align-items:center; width:100%">
-                        <div class="s-rank-num">${i+1}</div>
-                        <div class="s-info" style="flex:1">
-                            <div class="s-name">${p.n}</div>
-                            <span class="s-badge" style="color:${rank.c}">
-                                <i class="fas ${rank.i}"></i> ${rank.l}
-                            </span>
-                        </div>
-                        <div class="s-score" style="color:${rank.c}">${p.s}</div>
-                    </div>
+    function adjustVolume(v) {
+        const bgm = document.getElementById('bgm');
+        bgm.volume = v;
+        lastVol = v;
+        
+        if(v > 0 && isMuted) {
+            isMuted = false;
+            bgm.play();
+            document.getElementById('muteIcon').className = "fas fa-volume-up";
+        } else if (v == 0) {
+            isMuted = true;
+            document.getElementById('muteIcon').className = "fas fa-volume-mute";
+        }
+    }
+
+    function playSound() { 
+        if(!isMuted) { audioCoin.currentTime=0; audioCoin.play(); } 
+    }
+
+    // --- RENDERING ---
+    function renderTabs() {
+        document.getElementById('tabs').innerHTML = classes.map(c => 
+            `<button class="tab-btn ${c===activeCl?'active':''}" onclick="setCl('${c}')">${c}</button>`
+        ).join('');
+    }
+
+    function setCl(c) {
+        activeCl = c;
+        playSound();
+        renderTabs();
+        renderList();
+    }
+
+    function renderList() {
+        const q = document.getElementById('search').value.toLowerCase();
+        let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
+        
+        const pod = document.getElementById('podium');
+        pod.innerHTML = "";
+        const top3 = list.slice(0,3);
+        const order = [1,0,2]; 
+        order.forEach(i => {
+            if(top3[i]) {
+                const p = top3[i];
+                const rank = i+1;
+                const icons = ['👑','🥈','🥉'];
+                pod.innerHTML += `<div class="podium-card r-${rank}" onclick="showCard('${p.n}',${p.s})">
+                    <div style="font-size:2rem; margin-bottom:5px;">${icons[i]}</div>
+                    <div class="p-score">${p.s}</div>
+                    <div class="p-name">${p.n.split(" ")[0]}</div>
                 </div>`;
-            });
-            cont.innerHTML = listHTML;
-        }
-
-        // ================= HELPER FUNCTIONS =================
-        function getRank(s) {
-            if(s >= 300) return { l:"KHALIFAH", c:"#7c3aed", i:"fa-crown" };      // Purple
-            if(s >= 150) return { l:"ELITE", c:"#f59e0b", i:"fa-medal" };         // Gold
-            if(s >= 50) return { l:"PRO", c:"#0ea5e9", i:"fa-shield-alt" };       // Blue
-            return { l:"NEWBIE", c:"#16a34a", i:"fa-seedling" };                  // Green
-        }
-
-        function showCard(n, s) {
-            const r = getRank(s);
-            const modal = document.getElementById('card-modal');
-            
-            document.getElementById('m-name').innerText = n; 
-            
-            const scoreEl = document.getElementById('m-score');
-            scoreEl.innerText = s;
-            scoreEl.style.color = r.c; 
-            
-            const badgeEl = document.getElementById('m-rank-badge');
-            badgeEl.innerText = r.l;
-            badgeEl.style.color = r.c; 
-            badgeEl.style.border = `1px solid ${r.c}`;
-            
-            const iconEl = document.getElementById('m-rank-icon');
-            iconEl.className = `fas ${r.i}`; 
-            iconEl.style.color = r.c;
-
-            modal.style.display = 'flex';
-            playSound();
-            
-            // Confetti effect bila buka card
-            confetti({
-                particleCount: 100,
-                spread: 70,
-                origin: { y: 0.6 },
-                colors: [r.c, '#ffffff'] 
-            });
-        }
-
-        function closeCard() { 
-            document.getElementById('card-modal').style.display='none'; 
-        }
-
-        async function shareCard() {
-            const btn = document.querySelector('.share-btn');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Saving...`;
-            
-            try {
-                const area = document.getElementById('capture-area');
-                // Hide button & close during capture
-                document.querySelector('.close-btn').style.display = 'none';
-                btn.style.display = 'none';
-
-                const canvas = await html2canvas(area, { 
-                    backgroundColor: '#0f172a', 
-                    scale: 2, // High resolution
-                    useCORS: true 
-                });
-                
-                const link = document.createElement('a');
-                link.download = `Merit_${document.getElementById('m-name').innerText}.png`;
-                link.href = canvas.toDataURL(); 
-                link.click();
-
-            } catch(err) {
-                alert("Gagal simpan gambar. Sila screenshot manual.");
-            } finally {
-                // Restore buttons
-                document.querySelector('.close-btn').style.display = 'block';
-                btn.style.display = 'flex';
-                btn.innerHTML = originalText;
             }
-        }
+        });
 
-        // ================= AUDIO FUNCTIONS =================
-        function enterArena() {
-            document.getElementById('start-screen').style.display = 'none';
-            document.getElementById('audioPanel').classList.add('visible');
-            
-            const bgm = document.getElementById('bgm'); 
-            bgm.volume = lastVol; 
-            
-            // Cuba play (browser policy fix)
-            const playPromise = bgm.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(error => {
-                    console.log("Audio autoplay blocked. User interaction needed.");
-                });
-            }
+        const cont = document.getElementById('list');
+        cont.innerHTML = "";
+        list.forEach((p, i) => {
+            if(q && !p.n.toLowerCase().includes(q)) return;
+            const rank = getRank(p.s);
+            const isTop3 = i < 3;
+            cont.innerHTML += `<div class="student-row" style="${isTop3?'border-left:3px solid '+rank.c:''}" onclick="showCard('${p.n}',${p.s})">
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <span style="color:#64748b; font-family:'Orbitron'; width:25px;">#${i+1}</span>
+                    <div>
+                        <div style="font-weight:700;">${p.n}</div>
+                        <div style="font-size:0.7rem; color:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</div>
+                    </div>
+                </div>
+                <div class="s-score" style="color:${rank.c}">${p.s}</div>
+            </div>`;
+        });
+    }
 
-            playSound(); 
-            confetti({ particleCount: 150, spread: 100, origin: { y: 0.5 } });
-        }
+    function getRank(s) {
+        if(s >= 300) return { l:"KHALIFAH", c:"#7c3aed", i:"fa-crown" };
+        if(s >= 150) return { l:"ELITE", c:"#f59e0b", i:"fa-medal" };
+        if(s >= 50) return { l:"PRO", c:"#3b82f6", i:"fa-shield-alt" };
+        return { l:"NEWBIE", c:"#22c55e", i:"fa-seedling" };
+    }
 
-        function toggleMute() { 
-            const bgm = document.getElementById('bgm'); 
-            isMuted = !isMuted;
-            
-            if(isMuted) { 
-                bgm.pause(); 
-                document.getElementById('muteIcon').className = "fas fa-volume-mute"; 
-            } else { 
-                bgm.play(); 
-                document.getElementById('muteIcon').className = "fas fa-volume-up"; 
-            }
-        }
+    function showCard(n, s) {
+        const r = getRank(s);
+        document.getElementById('card-modal').style.display = 'flex';
+        document.getElementById('m-name').innerText = n;
+        document.getElementById('m-score').innerText = s;
+        document.getElementById('m-score').style.color = r.c;
+        document.getElementById('m-rank-badge').innerText = r.l;
+        document.getElementById('m-rank-badge').style.color = r.c;
+        document.getElementById('m-rank-icon').className = `fas ${r.i}`;
+        document.getElementById('m-rank-icon').style.color = r.c;
+        
+        if(s>=300) document.getElementById('m-desc').innerText = '"Lagenda Bahasa Arab!"';
+        else if(s>=150) document.getElementById('m-desc').innerText = '"Pejuang Sejati!"';
+        else if(s>=50) document.getElementById('m-desc').innerText = '"Semangat Membara!"';
+        else document.getElementById('m-desc').innerText = '"Mula Langkah Pertama!"';
+        
+        playSound();
+    }
 
-        function adjustVolume(v) { 
-            document.getElementById('bgm').volume = v; 
-            lastVol = v; 
-        }
-
-        function playSound() { 
-            if(!isMuted) { 
-                audioCoin.currentTime=0; 
-                audioCoin.play().catch(e => console.log("Sound effect error")); 
-            } 
-        }
-
-        async function manualRefresh(btn) {
-            btn.classList.add('spinning'); 
-            lastDataFingerprint = ""; // Force update
-            await fetchData(); 
-            setTimeout(() => btn.classList.remove('spinning'), 500);
-        }
-    </script>
+    function closeCard() { document.getElementById('card-modal').style.display='none'; }
+    
+    async function shareCard() {
+        const area = document.getElementById('capture-area');
+        const canvas = await html2canvas(area, { backgroundColor: '#0f172a', scale: 2 });
+        const link = document.createElement('a');
+        link.download = `ArabicMerit_${document.getElementById('m-name').innerText}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+    }
+</script>
 </body>
 </html>
