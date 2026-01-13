@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN CONSOLE - Arabic Merit Pro V13.5 (Log History)</title>
+    <title>ADMIN CONSOLE - Arabic Merit Pro V13.3 (Cikgu Mode)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -161,8 +161,13 @@
 </div></div>
 
 <script>
-    // PASTIKAN URL INI ADALAH URL GOOGLE SCRIPT V3 (YG BARU)
-    const CLOUD_URL = "https://script.google.com/macros/s/AKfycbwJgeiE56ZauzhO9MMWOPKVIsaXuD8QvK1b6-n4RswZLNZ3M82GvDOikHU_gtCuS4R3/exec";
+    // ===========================================
+    // SETTING SCRIPT TERKINI (UPDATED)
+    // ===========================================
+    // Ini link script yang tuan bagi tadi:
+    const CLOUD_URL = "https://script.google.com/macros/s/AKfycbwbI3aEh2q7IqIsQpZ7DFX2JuQFWbrFv3MASzCsMHHFmQTX8HXpR-oPK8L4FmSS_Wye/exec";
+    
+    // PASSWORD: apipfathan@123
     const SECRET_KEY = "YXBpcGZhdGhhbkAxMjM="; 
     const STORAGE_KEY = "ARABIC_DESKTOP_DB_V13";
     
@@ -181,10 +186,12 @@
 
     async function loadCloud() {
         try {
+            status("🔄 Syncing...", "color:#ca8a04");
             const res = await fetch(CLOUD_URL);
             const data = await res.json();
             if(data.length > 0) {
-                db = data.map(r => ({ n: String(r[0]), s: parseInt(r[1]) || 0, c: String(r[2]) }));
+                // Map data supaya konsisten: [Nama, Skor, Kelas]
+                db = data.map(r => ({ n: String(r.n || r[0]), s: parseInt(r.s || r[1]) || 0, c: String(r.c || r[2]) }));
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
                 updateClassList();
                 status("● Cloud Connected", "color:var(--success)");
@@ -193,34 +200,18 @@
         } catch (e) { status("● Offline Mode", "color:var(--warning)"); }
     }
 
-    // FUNGSI UPDATE MARKAH + LOG SEJARAH
-    async function mod(n, v, idx, reason) {
-        const p = db.find(x => x.n === n && x.c === activeCls);
-        if(p) { 
-            p.s += v; 
-            if(p.s < 0) p.s = 0; // Floor 0
-            refresh(); 
-            
-            // Simpan Data Tempatan
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-
-            // Animasi
-            const el = document.getElementById(`score-${idx}`);
-            if(el) { el.classList.remove('pop-anim'); void el.offsetWidth; el.classList.add('pop-anim'); }
-
-            showToast(`${reason} (${v>0?'+':''}${v})`, v>0 ? 'success':'danger');
-
-            // HANTAR DATA KE GOOGLE SHEET (DENGAN LOG)
-            try {
-                await fetch(CLOUD_URL, {
-                    method: "POST",
-                    body: JSON.stringify({
-                        updates: [{ n: n, s: p.s, c: activeCls, r: reason, val: v }]
-                    })
-                });
-                status("● Saved & Logged", "color:var(--success)");
-            } catch (e) { status("● Save Error", "color:var(--danger)"); }
-        }
+    async function sync() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        // Kita hantar guna 'bulk_update' untuk pastikan admin override semua data
+        const rows = db.map(p => [p.n, p.s, p.c]);
+        try {
+            await fetch(CLOUD_URL, { 
+                method: "POST", 
+                mode: 'no-cors', 
+                body: JSON.stringify({ action: "bulk_update", data: rows }) 
+            });
+            status("● Cloud Synced", "color:var(--success)");
+        } catch (e) { status("● Sync Error", "color:var(--danger)"); }
     }
 
     function updateClassList() {
@@ -241,16 +232,16 @@
             ghostClass: 'sortable-ghost',
             onEnd: function() {
                 classes = Array.from(document.getElementById('tabContainer').children).map(b => b.innerText);
-                // Sync susunan kelas kalau perlu
+                sync();
             }
         });
     }
 
     function getRank(s) {
-        if(s >= 300) return { l:"KHALIFAH", c:"#7c3aed", i:"fa-crown" };
-        if(s >= 150) return { l:"ELITE", c:"#f59e0b", i:"fa-medal" };
-        if(s >= 50) return { l:"PRO", c:"#0ea5e9", i:"fa-shield-alt" };
-        return { l:"NEWBIE", c:"#16a34a", i:"fa-seedling" };
+        if(s >= 300) return { l:"KHALIFAH", c:"#7c3aed", i:"fa-crown" };      
+        if(s >= 150) return { l:"ELITE", c:"#f59e0b", i:"fa-medal" };         
+        if(s >= 50) return { l:"PRO", c:"#0ea5e9", i:"fa-shield-alt" };       
+        return { l:"NEWBIE", c:"#16a34a", i:"fa-seedling" };                  
     }
 
     function refresh() {
@@ -260,7 +251,7 @@
         let list = db.filter(x => x.c === activeCls).sort((a,b) => b.s - a.s);
         
         list.forEach((p, idx) => {
-            if(!p.n.includes(q)) return;
+            if(!p.n.toUpperCase().includes(q)) return;
             const rank = getRank(p.s);
             const tr = document.createElement('tr');
             
@@ -281,17 +272,19 @@
                 ${isAdmin ? `<td>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="score-btns">
-                            <button class="btn-pts" style="background:#16a34a" onclick="mod('${p.n}', 5, ${idx}, 'Hadir Kelas')">HADIR (+5)</button>
-                            <button class="btn-pts" style="background:#2563eb" onclick="mod('${p.n}', 3, ${idx}, 'Siap Tugasan')">SIAP (+3)</button>
-                            <button class="btn-pts" style="background:#8b5cf6" onclick="mod('${p.n}', 2, ${idx}, 'Modul Tambahan')">MODUL (+2)</button>
+                            <button class="btn-pts" style="background:#16a34a" onclick="mod('${p.n}', 4, ${idx})">📖 HAFAL (+4)</button>
+                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -4, ${idx})">❌ T.HAFAL (-4)</button>
                             
-                            <button class="btn-pts" style="background:var(--gold); color:white; border:1px solid #d97706" onclick="mod('${p.n}', 10, ${idx}, 'Datang Awal')">EARLY (+10)</button>
-                            <button class="btn-pts" style="background:#0891b2" onclick="mod('${p.n}', 5, ${idx}, 'Sikap Memimpin')">KETUA (+5)</button>
-                            <button class="btn-pts" style="background:#be123c" onclick="mod('${p.n}', -2, ${idx}, 'Datang Lewat')">LEWAT (-2)</button>
+                            <button class="btn-pts" style="background:#2563eb" onclick="mod('${p.n}', 8, ${idx})">📝 SIAP (+8)</button>
+                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -8, ${idx})">❌ T.SIAP (-8)</button>
                             
-                            <button class="btn-pts" style="background:#475569" onclick="mod('${p.n}', -1, ${idx}, 'Buat Bising')">BISING (-1)</button>
-                            <button class="btn-pts" style="background:#475569" onclick="mod('${p.n}', -3, ${idx}, 'Tugasan Tidak Siap')">T.SIAP (-3)</button>
-                            <button class="btn-pts" style="background:#0f172a" onclick="mod('${p.n}', -5, ${idx}, 'Ponteng Kelas')">PONTENG (-5)</button>
+                            <button class="btn-pts" style="background:var(--gold); color:black; border:1px solid #d97706" onclick="mod('${p.n}', 10, ${idx})">⚡ EARLY (+10)</button>
+
+                            <button class="btn-pts" style="background:#0891b2" onclick="mod('${p.n}', 5, ${idx})">👋 HADIR (+5)</button>
+                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -8, ${idx})">🚫 T.HADIR (-8)</button>
+                            
+                            <button class="btn-pts" style="background:#8b5cf6" onclick="mod('${p.n}', 1, ${idx})">⭐ TERPUJI (+1)</button>
+                            <button class="btn-pts" style="background:#1e293b" onclick="mod('${p.n}', -1, ${idx})">⚠️ DISIPLIN (-1)</button>
                         </div>
                         <button onclick="delStu('${p.n}')" style="border:none; background:none; color:#cbd5e1; cursor:pointer; font-size:1rem; margin-left:5px"><i class="fas fa-trash"></i></button>
                     </div>
@@ -301,6 +294,25 @@
         });
         updateChart(list.slice(0,5));
         updateStats(list);
+    }
+
+    function mod(n, v, idx) {
+        const p = db.find(x => x.n === n && x.c === activeCls);
+        if(p) { 
+            p.s += v; 
+            if(p.s < 0) p.s = 0; // Markah tak boleh negatif
+            refresh(); 
+            sync(); 
+            showToast(`${n}: ${v>0?'+':''}${v}`, v>0 ? 'success':'danger');
+            
+            // Animasi markah pop
+            const el = document.getElementById(`score-${idx}`);
+            if(el) {
+                el.classList.remove('pop-anim');
+                void el.offsetWidth; 
+                el.classList.add('pop-anim');
+            }
+        }
     }
 
     function showToast(msg, type) {
@@ -313,28 +325,19 @@
     }
 
     function delStu(n) {
-        if(confirm(`Padam pelajar ${n}?`)) { 
-            db = db.filter(x => !(x.n === n && x.c === activeCls)); 
-            refresh(); 
-            // Hantar delete request (optional logic boleh tambah nnti)
-            showToast("Pelajar dipadam", "danger"); 
-        }
+        if(confirm(`Padam pelajar ${n}?`)) { db = db.filter(x => !(x.n === n && x.c === activeCls)); refresh(); sync(); showToast("Pelajar dipadam", "danger"); }
     }
 
     function delClass() {
         if(confirm(`AWAS! Padam KELAS ${activeCls}?`)) {
             db = db.filter(x => x.c !== activeCls);
-            activeCls = ""; updateClassList(); refresh();
-            // Sync delete class logic
+            activeCls = ""; updateClassList(); refresh(); sync();
         }
     }
 
     function confirmReset() {
         db.forEach(p => { if(p.c === activeCls) p.s = 0; });
-        refresh(); 
-        // Reset juga hantar data kosong ke server
-        mod("DUMMY", 0, 0, "RESET KELAS"); // Trigger sync
-        closeM('resetM'); showToast("Markah di-reset", "danger");
+        refresh(); sync(); closeM('resetM'); showToast("Markah di-reset", "danger");
     }
 
     function updateChart(data) {
@@ -372,8 +375,21 @@
     }
 
     function logout() { location.reload(); }
-    function renderTabs() { document.getElementById('tabContainer').innerHTML = classes.map(c => `<button class="tab-btn ${c===activeCls?'active':''}" onclick="setCls('${c}')">${c}</button>`).join(''); }
-    function setCls(c) { activeCls = c; renderTabs(); refresh(); }
+    
+    function renderTabs() { 
+        document.getElementById('tabContainer').innerHTML = classes.map(c => `<button class="tab-btn ${c===activeCls?'active':''}" onclick="setCls('${c}')">${c}</button>`).join(''); 
+    }
+    
+    function setCls(c) { 
+        activeCls = c;
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => {
+            if(btn.innerText === c) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        refresh(); 
+    }
+    
     function status(m, s) { const el = document.getElementById('syncStatus'); el.innerText = m; el.style = s; }
     
     function openM(id) { 
@@ -384,22 +400,12 @@
 
     function saveNew() {
         const n = document.getElementById('newName').value.toUpperCase().trim();
-        if(n) { 
-            db.push({n, s:0, c:activeCls}); 
-            refresh(); closeM('addM'); document.getElementById('newName').value=""; 
-            mod(n, 0, 0, "DAFTAR BARU"); // Trigger save
-            showToast("Pelajar Ditambah", "success"); 
-        }
+        if(n) { db.push({n, s:0, c:activeCls}); sync(); refresh(); closeM('addM'); document.getElementById('newName').value=""; showToast("Pelajar Ditambah", "success"); }
     }
 
     function saveNewClass() {
         const c = document.getElementById('newClassName').value.toUpperCase().trim();
-        if(c && !classes.includes(c)) { 
-            db.push({n: "PELAJAR PERTAMA", s:0, c:c}); activeCls = c; 
-            updateClassList(); refresh(); closeM('addClassM'); 
-            mod("PELAJAR PERTAMA", 0, 0, "KELAS BARU"); // Trigger save
-            showToast("Kelas Ditambah", "info"); 
-        }
+        if(c && !classes.includes(c)) { db.push({n: "PELAJAR PERTAMA", s:0, c:c}); activeCls = c; updateClassList(); sync(); refresh(); closeM('addClassM'); showToast("Kelas Ditambah", "info"); }
     }
 
     function exportPDF() {
