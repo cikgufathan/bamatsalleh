@@ -67,7 +67,8 @@
             border: 1px solid rgba(255,255,255,0.1); border-radius: 15px 15px 5px 5px;
             padding-bottom: 10px; cursor: pointer; transition: 0.3s;
         }
-        /* CSS Podium */
+        
+        /* CSS Podium Logic (Flex Order handled here) */
         .r-1 { height: 100%; border-top: 4px solid var(--gold); order: 2; z-index: 2; box-shadow: 0 0 20px rgba(251,191,36,0.2); }
         .r-2 { height: 80%; border-top: 4px solid #94a3b8; order: 1; }
         .r-3 { height: 70%; border-top: 4px solid #b45309; order: 3; }
@@ -168,7 +169,7 @@
 
 <script>
     // ===========================================
-    // UPDATE SCRIPT (FIXED PODIUM LOGIC)
+    // UPDATE SCRIPT (FIXED PODIUM & ICONS)
     // ===========================================
     
     const API_URL = "https://script.google.com/macros/s/AKfycbwbI3aEh2q7IqIsQpZ7DFX2JuQFWbrFv3MASzCsMHHFmQTX8HXpR-oPK8L4FmSS_Wye/exec";
@@ -190,7 +191,7 @@
             const res = await fetch(API_URL);
             const data = await res.json();
             
-            // ANTI-KELIP
+            // ANTI-KELIP (Cek data baru)
             const newFingerprint = JSON.stringify(data);
             if (newFingerprint === lastDataFingerprint) {
                 if(!isSilent) console.log("Data up-to-date.");
@@ -198,22 +199,21 @@
             }
             lastDataFingerprint = newFingerprint;
 
-            // Map Data
+            // Map Data (n=Name, s=Score, c=Class)
             db = data.map(x => ({ 
                 n: String(x.n || x[0]), 
                 s: parseInt(x.s || x[1]) || 0, 
                 c: String(x.c || x[2]) 
             }));
             
-            // Auto Update Class List (Tahan Lasak)
+            // Auto Update Class List
             const newClasses = [...new Set(db.map(x => x.c))].sort();
             
-            // Jika ada kelas baru atau berbeza, update senarai
             if(JSON.stringify(newClasses) !== JSON.stringify(classes)) {
                 classes = newClasses;
             }
             
-            // Jika kelas aktif hilang/kosong, reset ke 1st class
+            // Reset ke kelas pertama jika kelas aktif hilang
             if(!activeCl || !classes.includes(activeCl)) {
                 if(classes.length > 0) activeCl = classes[0];
             }
@@ -272,65 +272,83 @@
 
     function setCl(c) { activeCl = c; playSound(); renderTabs(); renderList(); }
 
+    // --- FUNGSI UTAMA YANG DIBAIKI ---
     function renderList() {
         const q = document.getElementById('search').value.toLowerCase();
+        
+        // 1. Susun Data (Markah Tertinggi di atas)
         let list = db.filter(x => x.c === activeCl).sort((a,b) => b.s - a.s || a.n.localeCompare(b.n));
         
         const pod = document.getElementById('podium'); 
-        const top3 = list.slice(0,3); 
         
-        // SUSUNAN VISUAL: [KIRI (2ND), TENGAH (1ST), KANAN (3RD)]
-        // Tapi kita kena ambil data berdasarkan RANKING SEBENAR dari array top3
-        // top3[0] = JUARA, top3[1] = NAIB JUARA, top3[2] = KETIGA
+        // 2. Ambil Top 3 Pelajar
+        const p1 = list[0]; // JUARA (Rank 1)
+        const p2 = list[1]; // NAIB JUARA (Rank 2)
+        const p3 = list[2]; // TEMPAT KETIGA (Rank 3)
         
-        const order = [1, 0, 2]; 
         let podHTML = "";
 
-        order.forEach(i => {
-            if(top3[i]) {
-                const p = top3[i]; 
-                
-                // LOGIK BARU (FIXED):
-                // 'i' adalah index dari ranking sebenar.
-                // i=0 ialah Juara (Rank 1), i=1 ialah Naib Juara (Rank 2), i=2 ialah Ketiga (Rank 3)
-                
-                let visualClass = "";
-                let icon = "";
-                
-                if (i === 0) { // JUARA (Rank 1)
-                    visualClass = "r-1"; // Paling Tinggi
-                    icon = "👑"; // Crown
-                } else if (i === 1) { // NAIB JUARA (Rank 2)
-                    visualClass = "r-2"; // Sederhana
-                    icon = "🥈"; // Silver
-                } else { // KETIGA (Rank 3)
-                    visualClass = "r-3"; // Rendah
-                    icon = "🥉"; // Bronze
-                }
+        // PENTING: Kita bina HTML untuk semua 3 tiang.
+        // CSS 'order' di .r-1, .r-2, .r-3 akan menyusunnya secara visual: Kiri (r-2), Tengah (r-1), Kanan (r-3).
+        
+        // a. NAIB JUARA (Class r-2, Silver)
+        if(p2) {
+            podHTML += `<div class="podium-card r-2" onclick="showCard('${p2.n}',${p2.s})">
+                <div style="font-size:2rem; margin-bottom:5px; color:#94a3b8;"><i class="fas fa-medal"></i></div>
+                <div class="p-score">${p2.s}</div>
+                <div class="p-name">${p2.n.split(" ")[0]}</div>
+            </div>`;
+        } else {
+            podHTML += `<div class="podium-card r-2" style="opacity:0; pointer-events:none;"></div>`;
+        }
 
-                podHTML += `<div class="podium-card ${visualClass}" onclick="showCard('${p.n}',${p.s})">
-                    <div style="font-size:2rem; margin-bottom:5px;">${icon}</div>
-                    <div class="p-score">${p.s}</div>
-                    <div class="p-name">${p.n.split(" ")[0]}</div>
-                </div>`;
-            } else {
-                 // Kotak halimunan supaya layout tak lari kalau pelajar kurang dari 3
-                 podHTML += `<div class="podium-card" style="opacity:0; pointer-events:none;"></div>`;
-            }
-        });
+        // b. JUARA (Class r-1, Gold, Crown)
+        if(p1) {
+            podHTML += `<div class="podium-card r-1" onclick="showCard('${p1.n}',${p1.s})">
+                <div style="font-size:2.5rem; margin-bottom:5px; color:#fbbf24; text-shadow:0 0 10px rgba(251,191,36,0.5);"><i class="fas fa-crown"></i></div>
+                <div class="p-score">${p1.s}</div>
+                <div class="p-name">${p1.n.split(" ")[0]}</div>
+            </div>`;
+        } else {
+             podHTML += `<div class="podium-card r-1" style="opacity:0; pointer-events:none;"></div>`;
+        }
+
+        // c. TEMPAT KETIGA (Class r-3, Bronze)
+        if(p3) {
+            podHTML += `<div class="podium-card r-3" onclick="showCard('${p3.n}',${p3.s})">
+                <div style="font-size:2rem; margin-bottom:5px; color:#b45309;"><i class="fas fa-medal"></i></div>
+                <div class="p-score">${p3.s}</div>
+                <div class="p-name">${p3.n.split(" ")[0]}</div>
+            </div>`;
+        } else {
+            podHTML += `<div class="podium-card r-3" style="opacity:0; pointer-events:none;"></div>`;
+        }
+
         pod.innerHTML = podHTML;
 
+        // 3. Render Senarai Penuh di Bawah
         const cont = document.getElementById('list'); 
         let listHTML = "";
 
         list.forEach((p, i) => {
             if(q && !p.n.toLowerCase().includes(q)) return;
-            const rank = getRank(p.s); const isTop3 = i < 3;
-            listHTML += `<div class="student-row" style="${isTop3?'border-left:3px solid '+rank.c:''}" onclick="showCard('${p.n}',${p.s})">
+            const rank = getRank(p.s); 
+            
+            // Highlight Top 3 dengan border tepi
+            let borderStyle = "1px solid rgba(255,255,255,0.03)";
+            if(i === 0) borderStyle = "border-left: 4px solid #fbbf24"; // Gold
+            else if(i === 1) borderStyle = "border-left: 4px solid #94a3b8"; // Silver
+            else if(i === 2) borderStyle = "border-left: 4px solid #b45309"; // Bronze
+
+            listHTML += `<div class="student-row" style="${borderStyle}" onclick="showCard('${p.n}',${p.s})">
                 <div style="display:flex; gap:10px; align-items:center;">
-                    <span style="color:#64748b; font-family:'Orbitron'; width:25px;">#${i+1}</span>
-                    <div><div style="font-weight:700;">${p.n}</div><div style="font-size:0.7rem; color:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</div></div>
-                </div><div class="s-score" style="color:${rank.c}">${p.s}</div>
+                    <span style="color:#64748b; font-family:'Orbitron'; width:30px; text-align:center;">#${i+1}</span>
+                    <div>
+                        <div style="font-weight:700;">${p.n}</div>
+                        <div style="font-size:0.7rem; color:${rank.c}"><i class="fas ${rank.i}"></i> ${rank.l}</div>
+                    </div>
+                </div>
+                <div class="s-score" style="color:${rank.c}">${p.s}</div>
             </div>`;
         });
         cont.innerHTML = listHTML;
@@ -346,9 +364,15 @@
     function showCard(n, s) {
         const r = getRank(s);
         document.getElementById('card-modal').style.display = 'flex';
-        document.getElementById('m-name').innerText = n; document.getElementById('m-score').innerText = s;
-        document.getElementById('m-score').style.color = r.c; document.getElementById('m-rank-badge').innerText = r.l;
-        document.getElementById('m-rank-badge').style.color = r.c; document.getElementById('m-rank-icon').className = `fas ${r.i}`; document.getElementById('m-rank-icon').style.color = r.c;
+        document.getElementById('m-name').innerText = n; 
+        document.getElementById('m-score').innerText = s;
+        document.getElementById('m-score').style.color = r.c; 
+        
+        document.getElementById('m-rank-badge').innerText = r.l;
+        document.getElementById('m-rank-badge').style.color = r.c; 
+        
+        document.getElementById('m-rank-icon').className = `fas ${r.i}`; 
+        document.getElementById('m-rank-icon').style.color = r.c;
         
         if(s>=300) document.getElementById('m-desc').innerText = '"Lagenda Bahasa Arab!"';
         else if(s>=150) document.getElementById('m-desc').innerText = '"Pejuang Sejati!"';
