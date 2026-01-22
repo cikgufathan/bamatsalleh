@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ADMIN CONSOLE - Arabic Merit Pro V13.3 (Cikgu Mode)</title>
+    <title>ADMIN CONSOLE - Arabic Merit Pro V13.4 (Stable)</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -58,6 +58,7 @@
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(4px); }
         .modal { background: white; padding: 30px; border-radius: 15px; width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; animation: slideUp 0.3s ease-out; }
         .modal input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .modal textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-family: inherit; resize: vertical; min-height: 150px; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .stat-box { padding: 15px; border-radius: 10px; border-left: 4px solid var(--primary); background: #f8fafc; text-align: center; }
@@ -74,6 +75,7 @@
         .toast { background: var(--dark); color: white; padding: 12px 24px; border-radius: 30px; font-weight: 500; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; animation: slideUp 0.3s forwards; }
         .toast.success { background: var(--success); }
         .toast.danger { background: var(--danger); }
+        .toast.warning { background: var(--warning); }
     </style>
 </head>
 <body onload="init()">
@@ -140,9 +142,10 @@
 </div>
 
 <div id="addM" class="overlay"><div class="modal">
-    <h3>Tambah Pelajar</h3>
-    <input type="text" id="newName" placeholder="Nama Penuh Pelajar" onkeypress="if(event.key==='Enter') saveNew()">
-    <button class="btn-action" style="background:var(--success); width:100%" onclick="saveNew()">Simpan Pelajar</button>
+    <h3>Tambah Pelajar (Pukal)</h3>
+    <p style="font-size:0.85rem; color:#64748b; margin-top:-10px; margin-bottom:10px">Masukkan satu nama setiap baris.</p>
+    <textarea id="newName" placeholder="Contoh:&#10;ALI BIN ABU&#10;SITI 'AISYAH&#10;MUTHU A/L RAJU"></textarea>
+    <button class="btn-action" style="background:var(--success); width:100%" onclick="saveNew()">Simpan Semua</button>
     <button class="btn-action" style="background:#e2e8f0; width:100%; margin-top:10px; color:black" onclick="closeM('addM')">Batal</button>
 </div></div>
 
@@ -161,14 +164,8 @@
 </div></div>
 
 <script>
-    // ===========================================
-    // SETTING SCRIPT TERKINI (UPDATED)
-    // ===========================================
-    // Ini link script yang tuan bagi tadi:
     const CLOUD_URL = "https://script.google.com/macros/s/AKfycbwbI3aEh2q7IqIsQpZ7DFX2JuQFWbrFv3MASzCsMHHFmQTX8HXpR-oPK8L4FmSS_Wye/exec";
-    
-    // PASSWORD: apipfathan@123
-    const SECRET_KEY = "YXBpcGZhdGhhbkAxMjM="; 
+    const SECRET_KEY = "YXBpcGZhdGhhbkAxMjM="; // apipfathan@123
     const STORAGE_KEY = "ARABIC_DESKTOP_DB_V13";
     
     let db = [];
@@ -190,7 +187,6 @@
             const res = await fetch(CLOUD_URL);
             const data = await res.json();
             if(data.length > 0) {
-                // Map data supaya konsisten: [Nama, Skor, Kelas]
                 db = data.map(r => ({ n: String(r.n || r[0]), s: parseInt(r.s || r[1]) || 0, c: String(r.c || r[2]) }));
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
                 updateClassList();
@@ -202,7 +198,6 @@
 
     async function sync() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-        // Kita hantar guna 'bulk_update' untuk pastikan admin override semua data
         const rows = db.map(p => [p.n, p.s, p.c]);
         try {
             await fetch(CLOUD_URL, { 
@@ -255,6 +250,9 @@
             const rank = getRank(p.s);
             const tr = document.createElement('tr');
             
+            // FIX: Menggunakan data-attribute untuk nama supaya simbol khas (', \, /) tidak merosakkan kod
+            const safeN = p.n.replace(/"/g, '&quot;'); 
+
             let rankDisplay = `<span style="color:#94a3b8">${idx+1}</span>`;
             if(idx === 0) rankDisplay = '🥇';
             if(idx === 1) rankDisplay = '🥈';
@@ -272,21 +270,21 @@
                 ${isAdmin ? `<td>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="score-btns">
-                            <button class="btn-pts" style="background:#16a34a" onclick="mod('${p.n}', 4, ${idx})">📖 HAFAL (+4)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -4, ${idx})">❌ T.HAFAL (-4)</button>
+                            <button class="btn-pts" style="background:#16a34a" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), 4, ${idx})">📖 HAFAL (+4)</button>
+                            <button class="btn-pts" style="background:#dc2626" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), -4, ${idx})">❌ T.HAFAL (-4)</button>
                             
-                            <button class="btn-pts" style="background:#2563eb" onclick="mod('${p.n}', 8, ${idx})">📝 SIAP (+8)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -8, ${idx})">❌ T.SIAP (-8)</button>
+                            <button class="btn-pts" style="background:#2563eb" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), 8, ${idx})">📝 SIAP (+8)</button>
+                            <button class="btn-pts" style="background:#dc2626" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), -8, ${idx})">❌ T.SIAP (-8)</button>
                             
-                            <button class="btn-pts" style="background:var(--gold); color:black; border:1px solid #d97706" onclick="mod('${p.n}', 10, ${idx})">⚡ EARLY (+10)</button>
+                            <button class="btn-pts" style="background:var(--gold); color:black; border:1px solid #d97706" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), 10, ${idx})">⚡ EARLY (+10)</button>
 
-                            <button class="btn-pts" style="background:#0891b2" onclick="mod('${p.n}', 5, ${idx})">👋 HADIR (+5)</button>
-                            <button class="btn-pts" style="background:#dc2626" onclick="mod('${p.n}', -8, ${idx})">🚫 T.HADIR (-8)</button>
+                            <button class="btn-pts" style="background:#0891b2" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), 5, ${idx})">👋 HADIR (+5)</button>
+                            <button class="btn-pts" style="background:#dc2626" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), -8, ${idx})">🚫 T.HADIR (-8)</button>
                             
-                            <button class="btn-pts" style="background:#8b5cf6" onclick="mod('${p.n}', 1, ${idx})">⭐ TERPUJI (+1)</button>
-                            <button class="btn-pts" style="background:#1e293b" onclick="mod('${p.n}', -1, ${idx})">⚠️ DISIPLIN (-1)</button>
+                            <button class="btn-pts" style="background:#8b5cf6" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), 1, ${idx})">⭐ TERPUJI (+1)</button>
+                            <button class="btn-pts" style="background:#1e293b" data-n="${safeN}" onclick="mod(this.getAttribute('data-n'), -1, ${idx})">⚠️ DISIPLIN (-1)</button>
                         </div>
-                        <button onclick="delStu('${p.n}')" style="border:none; background:none; color:#cbd5e1; cursor:pointer; font-size:1rem; margin-left:5px"><i class="fas fa-trash"></i></button>
+                        <button data-n="${safeN}" onclick="delStu(this.getAttribute('data-n'))" style="border:none; background:none; color:#cbd5e1; cursor:pointer; font-size:1rem; margin-left:5px"><i class="fas fa-trash"></i></button>
                     </div>
                 </td>` : ''}
             `;
@@ -300,12 +298,11 @@
         const p = db.find(x => x.n === n && x.c === activeCls);
         if(p) { 
             p.s += v; 
-            if(p.s < 0) p.s = 0; // Markah tak boleh negatif
+            if(p.s < 0) p.s = 0;
             refresh(); 
             sync(); 
             showToast(`${n}: ${v>0?'+':''}${v}`, v>0 ? 'success':'danger');
             
-            // Animasi markah pop
             const el = document.getElementById(`score-${idx}`);
             if(el) {
                 el.classList.remove('pop-anim');
@@ -319,13 +316,19 @@
         const c = document.getElementById('toast-container');
         const t = document.createElement('div');
         t.className = `toast ${type}`;
-        t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle':'fa-exclamation-circle'}"></i> ${msg}`;
+        t.innerHTML = `<i class="fas ${type==='success'?'fa-check-circle': type==='danger'?'fa-exclamation-circle':'fa-info-circle'}"></i> ${msg}`;
         c.appendChild(t);
         setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(), 300) }, 2000);
     }
 
     function delStu(n) {
-        if(confirm(`Padam pelajar ${n}?`)) { db = db.filter(x => !(x.n === n && x.c === activeCls)); refresh(); sync(); showToast("Pelajar dipadam", "danger"); }
+        if(confirm(`Padam pelajar ${n}?`)) { 
+            // Filter yang lebih selamat
+            db = db.filter(x => !(x.n === n && x.c === activeCls)); 
+            refresh(); 
+            sync(); 
+            showToast("Pelajar dipadam", "danger"); 
+        }
     }
 
     function delClass() {
@@ -398,9 +401,37 @@
     }
     function closeM(id) { document.getElementById(id).style.display = 'none'; }
 
+    // ===========================================
+    // FIXED FUNCTION: BULK ADD STUDENT
+    // ===========================================
     function saveNew() {
-        const n = document.getElementById('newName').value.toUpperCase().trim();
-        if(n) { db.push({n, s:0, c:activeCls}); sync(); refresh(); closeM('addM'); document.getElementById('newName').value=""; showToast("Pelajar Ditambah", "success"); }
+        const rawText = document.getElementById('newName').value;
+        if(!rawText.trim()) return;
+
+        const lines = rawText.split(/\n/);
+        let count = 0;
+        let skipped = 0;
+
+        lines.forEach(line => {
+            const n = line.toUpperCase().trim();
+            if(n) {
+                // BUG FIX: Cek jika pelajar sudah wujud
+                const exists = db.some(x => x.n === n && x.c === activeCls);
+                if (!exists) {
+                    db.push({n: n, s: 0, c: activeCls});
+                    count++;
+                } else {
+                    skipped++;
+                }
+            }
+        });
+
+        if(count > 0 || skipped > 0) {
+            sync(); refresh(); closeM('addM'); 
+            document.getElementById('newName').value = ""; 
+            if(count > 0) showToast(`${count} Ditambah`, "success");
+            if(skipped > 0) setTimeout(() => showToast(`${skipped} Nama Wujud (Dibatalkan)`, "warning"), 1500);
+        }
     }
 
     function saveNewClass() {
@@ -417,9 +448,14 @@
     }
 
     function exportCSV() {
-        let csv = "Nama,Skor,Kelas\n" + db.map(p => `"${p.n}",${p.s},${p.c}`).join("\n");
+        // BUG FIX: Escape double quotes untuk CSV
+        let csv = "Nama,Skor,Kelas\n" + db.map(p => {
+            const safeName = p.n.replace(/"/g, '""'); 
+            return `"${safeName}",${p.s},${p.c}`;
+        }).join("\n");
+        
         const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
-        a.download = `Backup_Master.csv`; a.click();
+        a.download = `Backup_Merit.csv`; a.click();
         showToast("CSV Dimuat Turun", "success");
     }
 </script>
